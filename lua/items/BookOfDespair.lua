@@ -1,7 +1,7 @@
 local mod = AntibirthItemPack
 
 function mod:UseBookOfDespair(_Type, RNG, player, flags, slot, data)
-	if not (flags & UseFlag.USE_CARBATTERY > 0) then
+	if flags & UseFlag.USE_CARBATTERY == 0 then
 		local tempEffects = player:GetEffects():GetCollectibleEffectNum(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
 		if GiantBookAPI and tempEffects == 0 then
 			GiantBookAPI.playGiantBook("Appear", "Despair.png", Color(228/255, 228/255, 228/255, 1, 0, 0, 0), Color(228/255, 228/255, 228/255, 153/255, 0, 0, 0), Color(225/255, 225/255, 225/255, 128/255, 0, 0, 0))
