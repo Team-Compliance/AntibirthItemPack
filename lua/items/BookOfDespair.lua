@@ -1,60 +1,28 @@
 local mod = AntibirthItemPack
 
-function mod:UseBookOfDespair(_Type, RNG, player)
-	local data = mod:GetData(player)
-	if GiantBookAPI and data.DespairPower < 1 then
-		GiantBookAPI.playGiantBook("Appear", "Despair.png", Color(0.9, 0.9, 0.9, 1, 0, 0, 0), Color(0.9, 0.9, 0.9, 0.6, 0, 0, 0), Color(0.9, 0.9, 0.9, 0.5, 0, 0, 0))
+function mod:UseBookOfDespair(_Type, RNG, player, flags, slot, data)
+	if not (flags & UseFlag.USE_CARBATTERY > 0) then
+		local tempEffects = player:GetEffects():GetCollectibleEffectNum(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
+		if GiantBookAPI and tempEffects == 0 then
+			GiantBookAPI.playGiantBook("Appear", "Despair.png", Color(228/255, 228/255, 228/255, 1, 0, 0, 0), Color(228/255, 228/255, 228/255, 153/255, 0, 0, 0), Color(225/255, 225/255, 225/255, 128/255, 0, 0, 0))
+		end
+		SFXManager():Play(SoundEffect.SOUND_BOOK_PAGE_TURN_12, 0.8, 0, false, 1)
 	end
-	SFXManager():Play(SoundEffect.SOUND_BOOK_PAGE_TURN_12, 0.8, 0, false, 1)
 	
-	data.DespairPower = data.DespairPower + 1
-    player:AddCacheFlags(CacheFlag.CACHE_FIREDELAY)
-	player:EvaluateItems()
-    return true
-end
-
-function mod:OnNewRoom()
-    for i = 0, Game():GetNumPlayers() - 1 do
-        local player = Game():GetPlayer(i)
-		local data = mod:GetData(player)
-		
-        data.DespairPower = 0
-		
-        player:AddCacheFlags(CacheFlag.CACHE_FIREDELAY)
-		player:EvaluateItems()
-    end
+	return true
 end
 
 function mod:Despair_CacheEval(player, cacheFlag)
-	local data = mod:GetData(player)
-	if data.DespairPower == nil then
-		data.DespairPower = 0
-	end
-	if data.DespairPower > 0 then
-		for power = 1, data.DespairPower do
-			player.MaxFireDelay = player.MaxFireDelay / 2.0
-		end
-	end
-end
-
-function mod:Despair_Costume(player)
-	local tornConfig = Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_TORN_PHOTO)
-	local data = mod:GetData(player)
+	local tempEffects = player:GetEffects():GetCollectibleEffectNum(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
 	
-	if not player:HasCollectible(CollectibleType.COLLECTIBLE_TORN_PHOTO) then --Adding another torn photo costume is redundant if you have torn photo already
-		if not data.costumes then
-			data.costumes = 0
-		end
-		
-		while data.DespairPower > data.costumes do
-			player:AddCostume(tornConfig, false)
-			data.costumes = data.costumes + 1
-		end
-		while data.DespairPower < data.costumes do
-			data.costumes = data.costumes - 1
-			if data.costumes <= 0 then
-				player:TryRemoveCollectibleCostume(CollectibleType.COLLECTIBLE_TORN_PHOTO, true)
+	if tempEffects > 0 then
+		for count = 1, tempEffects do
+			local currentTears = 30 / (player.MaxFireDelay + 1)
+			local newTears = currentTears * 2
+			if count > 1 then
+				newTears = currentTears * 1.5
 			end
+			player.MaxFireDelay = math.max((30 / newTears) - 1, -0.75)
 		end
 	end
 end
@@ -67,7 +35,5 @@ if MiniMapiItemsAPI then
     MiniMapiItemsAPI:AddCollectible(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR, bookofdespairSprite, "CustomIconBookOfDepair", frame)
 end
 
-mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.OnNewRoom)
 mod:AddCallback(ModCallbacks.MC_USE_ITEM, mod.UseBookOfDespair, CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
 mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.Despair_CacheEval, CacheFlag.CACHE_FIREDELAY)
-mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, mod.Despair_Costume)
