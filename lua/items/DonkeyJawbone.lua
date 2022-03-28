@@ -95,11 +95,3 @@ function mod:SpawnJawbone(player)
 	
 	SFXManager():Play(SoundEffect.SOUND_SWORD_SPIN)
 end
-
---Minimap Items Compatibility
-if MiniMapiItemsAPI then
-    local frame = 1
-    local donkeyjawboneSprite = Sprite()
-    donkeyjawboneSprite:Load("gfx/ui/minimapitems/antibirthitempack_donkeyjawbone_icon.anm2", true)
-    MiniMapiItemsAPI:AddCollectible(CollectibleType.COLLECTIBLE_DONKEY_JAWBONE, donkeyjawboneSprite, "CustomIconDonkeyJawbone", frame)
-end

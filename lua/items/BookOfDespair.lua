@@ -27,13 +27,5 @@ function mod:Despair_CacheEval(player, cacheFlag)
 	end
 end
 
---Minimap Items Compatibility
-if MiniMapiItemsAPI then
-    local frame = 1
-    local bookofdespairSprite = Sprite()
-    bookofdespairSprite:Load("gfx/ui/minimapitems/antibirthitempack_bookofdespair_icon.anm2", true)
-    MiniMapiItemsAPI:AddCollectible(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR, bookofdespairSprite, "CustomIconBookOfDepair", frame)
-end
-
 mod:AddCallback(ModCallbacks.MC_USE_ITEM, mod.UseBookOfDespair, CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
 mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.Despair_CacheEval, CacheFlag.CACHE_FIREDELAY)

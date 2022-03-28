@@ -22,6 +22,10 @@ if Encyclopedia then
 	include("lua/encyclopedia.lua")
 end
 
+if MiniMapiItemsAPI then
+	include("lua/MiniMapiItemsAPI.lua")
+end
+
 if CCO and CCO.JOB_MOD then
 	Game():GetItemPool():RemoveCollectible(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR) --remove our book of despair if job mod is detected
 end

@@ -333,14 +333,6 @@ if Sewn_API then
 	Sewn_API:AddCallback(Sewn_API.Enums.ModCallbacks.FAMILIAR_UPDATE, MenorahSewingUpdateUltra, FamiliarVariant.MENORAH,  Sewn_API.Enums.FamiliarLevelFlag.FLAG_ULTRA)
 end
 
---Minimap Items Compatibility
-if MiniMapiItemsAPI then
-    local frame = 1
-    local menorahSprite = Sprite()
-    menorahSprite:Load("gfx/ui/minimapitems/antibirthitempack_menorah_icon.anm2", true)
-    MiniMapiItemsAPI:AddCollectible(CollectibleType.COLLECTIBLE_MENORAH, menorahSprite, "CustomIconMenorah", frame)
-end
-
 mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.onEvaluateCache, CacheFlag.CACHE_FAMILIARS)
 mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.onEvaluateCache, CacheFlag.CACHE_FIREDELAY)
 mod:AddCallback(ModCallbacks.MC_POST_FIRE_TEAR, mod.postFireTear)

@@ -270,12 +270,4 @@ function mod:WispUpdate(wisp)
 	end
 end
 
---Minimap Items Compatibility
-if MiniMapiItemsAPI then
-    local frame = 1
-    local bowloftearsSprite = Sprite()
-    bowloftearsSprite:Load("gfx/ui/minimapitems/antibirthitempack_bowloftears_icon.anm2", true)
-    MiniMapiItemsAPI:AddCollectible(CollectibleType.COLLECTIBLE_BOWL_OF_TEARS, bowloftearsSprite, "CustomIconBowlOfTears", frame)
-end
-
 mod:AddCallback(ModCallbacks.MC_FAMILIAR_UPDATE, mod.WispUpdate, FamiliarVariant.WISP)

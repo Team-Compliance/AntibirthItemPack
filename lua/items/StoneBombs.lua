@@ -89,12 +89,4 @@ function mod:SB_PostNewRoom()
 	bombs = {}
 end
 
---Minimap Items Compatibility
-if MiniMapiItemsAPI then
-    local frame = 1
-    local stonebombsSprite = Sprite()
-    stonebombsSprite:Load("gfx/ui/minimapitems/antibirthitempack_stonebombs_icon.anm2", true)
-    MiniMapiItemsAPI:AddCollectible(CollectibleType.COLLECTIBLE_STONE_BOMBS, stonebombsSprite, "CustomIconStoneBombs", frame)
-end
-
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.SB_PostNewRoom)
