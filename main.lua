@@ -7,7 +7,6 @@ CollectibleType.COLLECTIBLE_DONKEY_JAWBONE = Isaac.GetItemIdByName("Donkey Jawbo
 CollectibleType.COLLECTIBLE_MENORAH = Isaac.GetItemIdByName("Menorah")
 CollectibleType.COLLECTIBLE_STONE_BOMBS = Isaac.GetItemIdByName("Stone Bombs")
 
-include("lua/shockwaveAPI.lua")
 include("lua/items/BookOfDespair.lua")
 include("lua/items/BowlOfTears.lua")
 include("lua/items/DonkeyJawbone.lua")
