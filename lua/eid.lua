@@ -33,7 +33,7 @@ EID:addCollectible(CollectibleType.COLLECTIBLE_MENORAH, "Gere um familiar menora
 --Stone Bombs
 EID:addCollectible(CollectibleType.COLLECTIBLE_STONE_BOMBS, "{{Bomb}} +5 Bombs#Placed bombs now explode and create rock waves in all 4 cardinal directions#The rock waves can damage enemies, destroy objects, and reveal secret rooms", "Stone Bombs", "en_us")
 EID:addCollectible(CollectibleType.COLLECTIBLE_STONE_BOMBS, "{{Bomb}} +5 bombas#Las bombas colocadas ahora generan olas de piedra en los 4 puntos cardinales al explotar#Las olas de piedra pueden dañar enemigos, destruir objetos y revelar salas secretas", "Bombas de Piedra", "spa")
-EID:addCollectible(CollectibleType.COLLECTIBLE_STONE_BOMBS, "{{Bomb}} + 5 бомб#Бомбы теперь создают каменные волны во все 4-е основные стороны#Каменные волны могут наносить урон врагам, разрушать объекты и открывать секретные комнаты", "Каменные бомбы", "ru")
+EID:addCollectible(CollectibleType.COLLECTIBLE_STONE_BOMBS, "{{Bomb}} +5 бомб#Бомбы теперь создают каменные волны во все 4-е основные стороны#Каменные волны могут наносить урон врагам, разрушать объекты и открывать секретные комнаты", "Каменные бомбы", "ru")
 EID:addCollectible(CollectibleType.COLLECTIBLE_STONE_BOMBS, "{{Bomb}} +5 Bombas#Bombas colocadas agora explodem e criam ondas de pedra em 4 direções cardeais#As ondas de pedra podem causar dano aos inimigos, destruir objetos, e relevar salas sexretas", "Bombas de Pedra", "pt_br")
 
 if Sewn_API then
