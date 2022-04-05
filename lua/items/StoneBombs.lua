@@ -41,7 +41,7 @@ mod:AddCallback(ModCallbacks.MC_POST_BOMB_UPDATE, mod.SB_BombUpdate)
 
 function mod:SB_Explode(bomb, player)
 	for _, dir in pairs(directions) do
-		local crackwave = Isaac.Spawn(1000, 72, 0, bomb.Position, bomb.Velocity, player)
+		local crackwave = Isaac.Spawn(1000, 72, 1, bomb.Position, bomb.Velocity, player)
 		crackwave:ToEffect().Rotation = dir
 	end
 end
