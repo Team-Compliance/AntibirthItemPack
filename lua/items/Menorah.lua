@@ -3,9 +3,9 @@ function mod:onEvaluateCache(player, cacheFlag)
 	local data = mod:GetData(player)
 
 	if cacheFlag == CacheFlag.CACHE_FAMILIARS then
-		local numItem = player:GetCollectibleNum(CollectibleType.COLLECTIBLE_MENORAH)
+		local numFamiliars = player:GetCollectibleNum(CollectibleType.COLLECTIBLE_MENORAH) + player:GetEffects():GetCollectibleEffectNum(CollectibleType.COLLECTIBLE_MENORAH)
 		
-		player:CheckFamiliar(FamiliarVariant.MENORAH, numItem, player:GetCollectibleRNG(CollectibleType.COLLECTIBLE_MENORAH), Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_MENORAH))	
+		player:CheckFamiliar(FamiliarVariant.MENORAH, numFamiliars, player:GetCollectibleRNG(CollectibleType.COLLECTIBLE_MENORAH), Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_MENORAH))	
 	end
 	
 	if cacheFlag == CacheFlag.CACHE_FIREDELAY then
