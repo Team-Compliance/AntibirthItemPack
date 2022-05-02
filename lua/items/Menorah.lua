@@ -68,7 +68,7 @@ function mod:onLaserUpdate(laser)
 		if player:HasCollectible(CollectibleType.COLLECTIBLE_MENORAH) then
 			if (laser.FrameCount == 1) and (laser.Parent) then
 				if (not laserData.isSpreadLaser) and (laser.Parent:ToPlayer() or laserData.IsIncubusTear) then
-					if (laser.SubType == 0) and laser.Timeout ~= -1 then
+					if (laser.SubType == LaserSubType.LASER_SUBTYPE_LINEAR) and laser.Timeout ~= -1 then
 						for i = 2, data.MenorahFlames do
 							local correctedVelocity = laser.StartAngleDegrees - ((i-1) * 3)
 							if i % 2 == 0 then
@@ -126,7 +126,7 @@ function mod:onLaserUpdate(laser)
 							spreadSprite.Rotation = sprite.Rotation
 							spreadSprite.Scale = sprite.Scale
 						end
-					elseif (laser.SubType == 2) then -- Tech X
+					elseif (laser.SubType == LaserSubType.LASER_SUBTYPE_RING_PROJECTILE) then
 						for i = 1, data.MenorahFlames do
 							local correctedVelocity = laser.Velocity:Rotated((i-1) * -3)
 							if i % 2 == 0 then
