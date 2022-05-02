@@ -5,7 +5,7 @@ function mod:onEvaluateCache(player, cacheFlag)
 	if cacheFlag == CacheFlag.CACHE_FAMILIARS then
 		local numItem = player:GetCollectibleNum(CollectibleType.COLLECTIBLE_MENORAH)
 		
-		player:CheckFamiliar(FamiliarVariant.MENORAH, numFamiliars, player:GetCollectibleRNG(CollectibleType.COLLECTIBLE_MENORAH), Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_MENORAH))	
+		player:CheckFamiliar(FamiliarVariant.MENORAH, numItem, player:GetCollectibleRNG(CollectibleType.COLLECTIBLE_MENORAH), Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_MENORAH))	
 	end
 	
 	if cacheFlag == CacheFlag.CACHE_FIREDELAY then
