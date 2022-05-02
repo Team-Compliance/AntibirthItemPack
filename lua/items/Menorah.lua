@@ -4,7 +4,6 @@ function mod:onEvaluateCache(player, cacheFlag)
 
 	if cacheFlag == CacheFlag.CACHE_FAMILIARS then
 		local numItem = player:GetCollectibleNum(CollectibleType.COLLECTIBLE_MENORAH)
-		local numFamiliars = (numItem > 0 and numItem or 0)
 		
 		player:CheckFamiliar(FamiliarVariant.MENORAH, numFamiliars, player:GetCollectibleRNG(CollectibleType.COLLECTIBLE_MENORAH), Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_MENORAH))	
 	end
@@ -228,7 +227,6 @@ function mod:onFamiliarInit(menorah)
 	local data = mod:GetData(player)
 	data.MenorahFlames = 1
 	
-    menorah.IsFollower = true
 	menorah:AddToFollowers()
 end
 
@@ -333,8 +331,7 @@ if Sewn_API then
 	Sewn_API:AddCallback(Sewn_API.Enums.ModCallbacks.FAMILIAR_UPDATE, MenorahSewingUpdateUltra, FamiliarVariant.MENORAH,  Sewn_API.Enums.FamiliarLevelFlag.FLAG_ULTRA)
 end
 
-mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.onEvaluateCache, CacheFlag.CACHE_FAMILIARS)
-mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.onEvaluateCache, CacheFlag.CACHE_FIREDELAY)
+mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.onEvaluateCache)
 mod:AddCallback(ModCallbacks.MC_POST_FIRE_TEAR, mod.postFireTear)
 mod:AddCallback(ModCallbacks.MC_POST_LASER_UPDATE, mod.onLaserUpdate)
 mod:AddCallback(ModCallbacks.MC_POST_BOMB_UPDATE, mod.onBombUpdate)
