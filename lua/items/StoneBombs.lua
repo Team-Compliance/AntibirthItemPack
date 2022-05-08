@@ -12,7 +12,7 @@ function mod:SB_BombUpdate(bomb)
 	local data = mod:GetData(bomb)
 	
 	if player then
-		if bomb.FrameCount == 0 then
+		if bomb.FrameCount == 1 then
 			if bomb.Type == EntityType.ENTITY_BOMB then
 				if bomb.Variant ~= BombVariant.BOMB_THROWABLE then
 					if player:HasCollectible(CollectibleType.COLLECTIBLE_STONE_BOMBS) then
@@ -28,7 +28,7 @@ function mod:SB_BombUpdate(bomb)
 	if data.isStoneBomb then
 		local sprite = bomb:GetSprite()
 
-		if bomb.FrameCount == 0 then
+		if bomb.FrameCount == 1 then
 			if bomb.Variant == BombVariant.BOMB_NORMAL then
 				if not bomb:HasTearFlags(TearFlags.TEAR_BRIMSTONE_BOMB) then
 					if bomb:HasTearFlags(TearFlags.TEAR_GOLDEN_BOMB) then
