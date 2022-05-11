@@ -93,17 +93,17 @@ mod:AddCallback(ModCallbacks.MC_POST_TEAR_UPDATE, mod.TearUpdate)
 
 --chargin lasers
 function mod:BrimstoneBowlCharge(entityLaser)
-	
 	if entityLaser.SpawnerType == EntityType.ENTITY_PLAYER and not mod:GetData(entityLaser).isSpreadLaser then
 		local player = mod:GetPlayerFromTear(entityLaser)
 		if player then
 			if player:HasWeaponType(WeaponType.WEAPON_TECH_X) then
+				print(1)
 				FireTear(player)
 			elseif player:HasWeaponType(WeaponType.WEAPON_BRIMSTONE) and player:GetActiveWeaponEntity() then
-				if math.fmod(player:GetActiveWeaponEntity().FrameCount, player.MaxFireDelay) == 1 then
+				local delay = player:HasWeaponType(WeaponType.WEAPON_LUDOVICO_TECHNIQUE) and player.MaxFireDelay or 5
+				if math.fmod(player:GetActiveWeaponEntity().FrameCount, delay) == 1 then
 					mod:ChargeBowl(player)
 				end
-
 			end
 		end
 	end
