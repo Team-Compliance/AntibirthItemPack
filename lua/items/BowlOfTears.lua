@@ -97,10 +97,9 @@ function mod:BrimstoneBowlCharge(entityLaser)
 		local player = mod:GetPlayerFromTear(entityLaser)
 		if player then
 			if player:HasWeaponType(WeaponType.WEAPON_TECH_X) then
-				print(1)
 				FireTear(player)
 			elseif player:HasWeaponType(WeaponType.WEAPON_BRIMSTONE) and player:GetActiveWeaponEntity() then
-				local delay = player:HasWeaponType(WeaponType.WEAPON_LUDOVICO_TECHNIQUE) and player.MaxFireDelay or 5
+				local delay = player:GetActiveWeaponEntity().SubType == LaserSubType.LASER_SUBTYPE_RING_LUDOVICO and player.MaxFireDelay or 5
 				if math.fmod(player:GetActiveWeaponEntity().FrameCount, delay) == 1 then
 					mod:ChargeBowl(player)
 				end
