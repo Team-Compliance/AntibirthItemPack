@@ -24,13 +24,15 @@ mod:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, mod.TearBowlCharge)
 local function LudoCharge(entity)
 	local player = mod:GetPlayerFromTear(entity)
 	local data = mod:GetData(entity)
-	if player:GetActiveWeaponEntity() and entity.FrameCount > 0 then
-		if entity.TearFlags & TearFlags.TEAR_LUDOVICO == TearFlags.TEAR_LUDOVICO and GetPtrHash(player:GetActiveWeaponEntity()) == GetPtrHash(entity) then
-			if math.fmod(entity.FrameCount, player.MaxFireDelay) == 1 and not data.KnifeLudoCharge then
-				mod:ChargeBowl(player)
-				data.KnifeLudoCharge = true
-			elseif math.fmod(entity.FrameCount, player.MaxFireDelay) == ((player.MaxFireDelay - 2) > 1 and (player.MaxFireDelay - 2) or 1) and data.KnifeLudoCharge then
-				data.KnifeLudoCharge = nil
+	if player then
+		if player:GetActiveWeaponEntity() and entity.FrameCount > 0 then
+			if entity.TearFlags & TearFlags.TEAR_LUDOVICO == TearFlags.TEAR_LUDOVICO and GetPtrHash(player:GetActiveWeaponEntity()) == GetPtrHash(entity) then
+				if math.fmod(entity.FrameCount, player.MaxFireDelay) == 1 and not data.KnifeLudoCharge then
+					mod:ChargeBowl(player)
+					data.KnifeLudoCharge = true
+				elseif math.fmod(entity.FrameCount, player.MaxFireDelay) == ((player.MaxFireDelay - 2) > 1 and (player.MaxFireDelay - 2) or 1) and data.KnifeLudoCharge then
+					data.KnifeLudoCharge = nil
+				end
 			end
 		end
 	end
