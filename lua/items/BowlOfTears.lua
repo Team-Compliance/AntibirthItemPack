@@ -4,67 +4,70 @@ LaserVariant = {BRIMSTONE = 1, TECHNOLOGY = 2, MEGA_BLAST = 6,  TECH_BRIMSTONE =
 BowlMouseClick = {LEFT = 0, RIGHT = 1, WHEEL = 2, BACK = 3, FORWARD = 4}
 mod.MaxExtraTears = 1
 
-function mod:ExtraTearSum(player)
-	local has20 = player:HasCollectible(CollectibleType.COLLECTIBLE_20_20)
-	local num20 = player:GetCollectibleNum(CollectibleType.COLLECTIBLE_20_20)
-	local hasInner = player:HasCollectible(CollectibleType.COLLECTIBLE_INNER_EYE)
-	local numInner = player:GetCollectibleNum(CollectibleType.COLLECTIBLE_INNER_EYE)
-	local hasMutant = player:HasCollectible(CollectibleType.COLLECTIBLE_MUTANT_SPIDER)
-	local numMutant = player:GetCollectibleNum(CollectibleType.COLLECTIBLE_MUTANT_SPIDER)
-	local conjoined = player:HasPlayerForm(PlayerForm.PLAYERFORM_BABY)
-	local isKeeper = (player:GetPlayerType() == PlayerType.PLAYER_KEEPER) and true or false
-	local isKeeperB = (player:GetPlayerType() == PlayerType.PLAYER_KEEPER_B) and true or false
-	local startInnerMutant20 = (hasMutant or isKeeperB) and ((hasInner or isKeeper) and 4 or 3) or ((isKeeper and hasInner) and 3 or ((isKeeper or hasInner) and 2 or (has20 and 1 or 0)))
-	local keeperInnerNum = (hasInner and isKeeper) and (1 + numInner) or (hasInner and (numInner - 1) or 0)
-	local keeperBMutantNum = (hasMutant and isKeeperB) and (1 + numMutant) or (hasMutant and (numMutant - 1) or 0)
-	local laterInnerMutant20 = (has20 and (num20 - 1) or 0) + keeperInnerNum + keeperBMutantNum
-	local sum = (conjoined and 2 or 0) + startInnerMutant20 + laterInnerMutant20
-	return sum
-end
-
-function mod:MultiTearChargeCheck(player,ludolaser)
-	ludolaser = ludolaser or false
-	local datap = mod:GetData(player)
-	if datap.InnerMutant20 < 0 or (player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) and ludolaser) then
-		datap.InnerMutant20 = mod.MaxExtraTears
+local function FireTear(player)
+	local data = mod:GetData(player)
+	if data.PrevDelay and player.HeadFrameDelay > data.PrevDelay and player.HeadFrameDelay > 1 then 
 		mod:ChargeBowl(player)
-	else
-		datap.InnerMutant20 = datap.InnerMutant20 - 1
-	end
+	end 
+	data.PrevDelay = player.HeadFrameDelay
 end
 --firing tears updates the bowl
-function mod:TearBowlCharge(entityTear)
-	local player = mod:GetPlayerFromTear(entityTear)
-	if player then
-		local data = mod:GetData(player)
-		data.InnerMutant20 = data.InnerMutant20 - 1
-		local tearData = mod:GetData(entityTear)
-		if not tearData.isSpreadTear and data.InnerMutant20 < 0 then
-			data.InnerMutant20 = mod.MaxExtraTears
-			mod:ChargeBowl(player)
+function mod:TearBowlCharge(player)
+	if not player:HasWeaponType(WeaponType.WEAPON_LUDOVICO_TECHNIQUE) and not player:HasWeaponType(WeaponType.WEAPON_KNIFE)
+	and not player:HasWeaponType(WeaponType.WEAPON_ROCKETS) and not player:HasWeaponType(WeaponType.WEAPON_TECH_X)
+	and not player:HasWeaponType(WeaponType.WEAPON_BRIMSTONE) then
+		FireTear(player)
+	end
+end
+mod:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, mod.TearBowlCharge)
+
+local function LudoCharge(entity)
+	local player = mod:GetPlayerFromTear(entity)
+	local data = mod:GetData(entity)
+	if player:GetActiveWeaponEntity() and entity.FrameCount > 0 then
+		if entity.TearFlags & TearFlags.TEAR_LUDOVICO == TearFlags.TEAR_LUDOVICO and GetPtrHash(player:GetActiveWeaponEntity()) == GetPtrHash(entity) then
+			if math.fmod(entity.FrameCount, player.MaxFireDelay) == 1 and not data.KnifeLudoCharge then
+				mod:ChargeBowl(player)
+				data.KnifeLudoCharge = true
+			elseif math.fmod(entity.FrameCount, player.MaxFireDelay) == ((player.MaxFireDelay - 2) > 1 and (player.MaxFireDelay - 2) or 1) and data.KnifeLudoCharge then
+				data.KnifeLudoCharge = nil
+			end
 		end
 	end
 end
-mod:AddCallback(ModCallbacks.MC_POST_FIRE_TEAR, mod.TearBowlCharge)
 
 --updating knife charge
 function mod:KnifeBowlCharge(entityKnife)
 	local player = mod:GetPlayerFromTear(entityKnife)
 	local data = mod:GetData(entityKnife)
-	
 	if player then
-		if entityKnife.TearFlags & TearFlags.TEAR_LUDOVICO == TearFlags.TEAR_LUDOVICO then --ludo knife
-			if math.fmod(entityKnife.FrameCount,30) == 0 then
-				mod:MultiTearChargeCheck(player)
+		local sk = entityKnife:GetSprite()
+		if entityKnife.Variant == 10 and entityKnife.SubType == 0 then --spirit sword
+			if sk:GetFrame() == 3 and not data.SwordSpin then
+				mod:ChargeBowl(player)
+				data.SwordSpin = true
+			elseif data.SwordSpin then
+				for _,s in ipairs({"Left","Right","Down","Up"}) do
+					if (sk:IsPlaying("Attack"..s) or sk:IsPlaying("Spin"..s)) and sk:GetFrame() == 2 then
+						data.SwordSpin = nil
+						break
+					end
+				end
 			end
-		elseif entityKnife.Variant == 10 and entityKnife.SubType == 0 and entityKnife.FrameCount == 1 and not mod:GetData(entityKnife).SwordSwing then --spirit sword
-			mod:GetData(entityKnife).SwordSwing = true
-			mod:ChargeBowl(player)
 		elseif entityKnife:IsFlying() and not data.Flying then --knife flies
 			data.Flying = true
-			mod:MultiTearChargeCheck(player)
+			if GetPtrHash(player:GetActiveWeaponEntity()) == GetPtrHash(entityKnife) then
+				mod:ChargeBowl(player)
+			end
 		elseif not entityKnife:IsFlying() and data.Flying then --one charge check
 			data.Flying = nil
+		elseif entityKnife.Variant == 1 or entityKnife.Variant == 3 and GetPtrHash(player:GetActiveWeaponEntity()) == GetPtrHash(entityKnife) then
+			if sk:GetFrame() == 1 and not data.BoneSwing then
+				mod:ChargeBowl(player)
+				data.BoneSwing = true
+			end
+		else
+			LudoCharge(entityKnife)
 		end
 	end
 end
@@ -75,14 +78,8 @@ function mod:TearUpdate(entityTear)
 	local player = mod:GetPlayerFromTear(entityTear)
 	--updating charges with ludo
 	if player then
-		if not mod:GetData(entityTear).FromBowl and entityTear.TearFlags & TearFlags.TEAR_LUDOVICO == TearFlags.TEAR_LUDOVICO then
-			if player:HasWeaponType(WeaponType.WEAPON_LUDOVICO_TECHNIQUE)  then
-				if math.fmod(entityTear.FrameCount,8) == 0 then
-					mod:MultiTearChargeCheck(player)
-				end
-			end
-		end
-		--updating slight height and acceleration of tears from bowl
+		LudoCharge(entityTear)
+				--updating slight height and acceleration of tears from bowl
 		if entityTear.FrameCount == 1 and mod:GetData(entityTear).FromBowl then
 			local rng = player:GetCollectibleRNG(CollectibleType.COLLECTIBLE_BOWL_OF_TEARS)
 			entityTear.Height = mod:GetRandomNumber(-40,-24,rng)
@@ -97,30 +94,19 @@ function mod:BrimstoneBowlCharge(entityLaser)
 	
 	if entityLaser.SpawnerType == EntityType.ENTITY_PLAYER and not mod:GetData(entityLaser).isSpreadLaser then
 		local player = mod:GetPlayerFromTear(entityLaser)
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
-			if math.fmod(entityLaser.FrameCount,8) == 0 then
-				mod:MultiTearChargeCheck(player,true)
-			end
-		elseif entityLaser.Variant ~= LaserVariant.MEGA_BLAST and entityLaser.Variant ~= LaserVariant.TECH_ZERO then
-			if (entityLaser.Variant == LaserVariant.BRIMSTONE or entityLaser.Variant == LaserVariant.TECH_BRIMSTONE
-			or entityLaser.Variant == LaserVariant.BIG_BRIM or entityLaser.Variant == LaserVariant.TECHNOLOGY and entityLaser.SubType == 2
-			or entityLaser.Variant == LaserVariant.TECHSTONE) and 
-			math.fmod(entityLaser.FrameCount,4) == 1 or entityLaser.Variant == LaserVariant.TECHNOLOGY and entityLaser.FrameCount == 1 then
-				mod:MultiTearChargeCheck(player)
+		if player then
+			if player:HasWeaponType(WeaponType.WEAPON_TECH_X) then
+				FireTear(player)
+			elseif player:HasWeaponType(WeaponType.WEAPON_BRIMSTONE) and player:GetActiveWeaponEntity() then
+				if math.fmod(player:GetActiveWeaponEntity().FrameCount, player.MaxFireDelay) == 1 then
+					mod:ChargeBowl(player)
+				end
+
 			end
 		end
 	end
 end
---mod:AddCallback(ModCallbacks.MC_POST_LASER_UPDATE, mod.BrimstoneBowlCharge)
-
---haha bombs go boom
-function mod:BombBowlCharge(entityBomb)
-	local player = mod:GetPlayerFromTear(entityBomb)
-	if player and not mod:GetData(entityBomb).isSpreadTear then
-		mod:MultiTearChargeCheck(player)
-	end
-end
---mod:AddCallback(ModCallbacks.MC_POST_BOMB_INIT, mod.BombBowlCharge)
+mod:AddCallback(ModCallbacks.MC_POST_LASER_UPDATE, mod.BrimstoneBowlCharge)
 
 --that one scene from Dr. Strangelove 
 function mod:EpicBowlCharge(entityRocet)
@@ -164,13 +150,6 @@ mod:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, mod.DamagedWithBowl, EntityType
 --shooting tears from bowl
 function mod:BowlShoot(player)
 	local data = mod:GetData(player)
-	if mod.MaxExtraTears ~= mod:ExtraTearSum(player) then
-		mod.MaxExtraTears = mod:ExtraTearSum(player)
-		data.InnerMutant20 = mod.MaxExtraTears
-	end
-	if not data.InnerMutant20 then
-		data.InnerMutant20 = mod.MaxExtraTears
-	end
 	local rng = player:GetCollectibleRNG(CollectibleType.COLLECTIBLE_BOWL_OF_TEARS)
 	if data.HoldingBowl ~= -1 then
 		if player:GetActiveItem(ActiveSlot.SLOT_SECONDARY) == CollectibleType.COLLECTIBLE_BOWL_OF_TEARS and data.HoldingBowl then

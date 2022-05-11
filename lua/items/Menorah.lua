@@ -61,9 +61,9 @@ function mod:onLaserUpdate(laser)
 	
 	if player then
 		local data = mod:GetData(player)
-		if not laserData.isSpreadLaser then
-			mod:BrimstoneBowlCharge(laser)
-		end
+		--if not laserData.isSpreadLaser then
+		--	mod:BrimstoneBowlCharge(laser)
+		--end
 		
 		if player:HasCollectible(CollectibleType.COLLECTIBLE_MENORAH) then
 			if (laser.FrameCount == 1) and (laser.Parent) then
@@ -177,9 +177,9 @@ function mod:onBombUpdate(bomb)
 	
 	if player then
 		local data = mod:GetData(player)
-		if bomb.FrameCount == 1 and not bombData.isSpreadBomb then 
-			mod:BombBowlCharge(bomb)
-		end
+		--if bomb.FrameCount == 1 and not bombData.isSpreadBomb then 
+		--	mod:BombBowlCharge(bomb)
+		--end
 		if player:HasCollectible(CollectibleType.COLLECTIBLE_MENORAH) then
 			if (bomb.FrameCount == 1) and (bomb.Parent) and (bomb.IsFetus == true) then
 				if (not bombData.isSpreadBomb) and (bomb.Parent:ToPlayer() or bombData.IsIncubusTear) then
