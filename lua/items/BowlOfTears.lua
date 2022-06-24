@@ -43,6 +43,8 @@ function mod:KnifeBowlCharge(entityKnife)
 	local player = mod:GetPlayerFromTear(entityKnife)
 	local data = mod:GetData(entityKnife)
 	if player then
+		if player:GetPlayerType() == PlayerType.PLAYER_THEFORGOTTEN
+		or player:GetPlayerType() == PlayerType.PLAYER_THEFORGOTTEN_B then return end
 		local sk = entityKnife:GetSprite()
 		if entityKnife.Variant == 10 and entityKnife.SubType == 0 then --spirit sword
 			if sk:GetFrame() == 3 and not data.SwordSpin then
