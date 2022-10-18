@@ -13,6 +13,12 @@ include("lua/items/DonkeyJawbone.lua")
 include("lua/items/Menorah.lua")
 include("lua/items/StoneBombs.lua")
 
+mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, function(self)
+	if CCO and CCO.JOB_MOD then
+		Game():GetItemPool():RemoveCollectible(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR) --remove our book of despair if job mod is detected
+	end
+end)
+
 if EID then
 	include("lua/eid.lua")
 end
@@ -24,15 +30,6 @@ end
 if MiniMapiItemsAPI then
 	include("lua/MiniMapiItemsAPI.lua")
 end
-
-if CCO and CCO.JOB_MOD then
-	Game():GetItemPool():RemoveCollectible(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR) --remove our book of despair if job mod is detected
-end
-
-if ExtraBirthright then
-    include("lua/ExtraBirthright.lua")
-end
-
 
 -----------------------------------
 --Helper Functions (thanks piber)--
