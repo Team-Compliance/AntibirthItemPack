@@ -32,19 +32,31 @@ local function DupeTear(tear)
 	return nt
 end
 
+local function isEven(number)
+	return number % 2 == 0
+end
+
 function mod:postFireTear(tear)
 	local player = mod:GetPlayerFromTear(tear)
 	local tearData = mod:GetData(tear)
 	if player then
 		local data = mod:GetData(player)
 		if player:HasCollectible(CollectibleType.COLLECTIBLE_MENORAH) then
-			for i = 2, data.MenorahFlames do
-				local correctedVelocity = tear.Velocity:Rotated((i-1) * -3)
-				if i % 2 == 0 then
-					correctedVelocity = tear.Velocity:Rotated(i * 3)
+			tear:Remove()
+			for i = 1, data.MenorahFlames do
+				local correctedVelocity = tear.Velocity
+				if isEven(i) then
+					correctedVelocity = tear.Velocity:Rotated(i * -3)
+				else
+					correctedVelocity = tear.Velocity:Rotated((i-1) * 3)
 				end
-				
+
+				if isEven(data.MenorahFlames) then
+					correctedVelocity = correctedVelocity:Rotated(3)
+				end
+
 				local spreadTear = DupeTear(tear)
+				--spreadTear.Position = correctedPosition
 				spreadTear.Velocity = correctedVelocity
 				
 				if tearData.FromBowl then
