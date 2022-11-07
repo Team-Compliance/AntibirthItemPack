@@ -84,11 +84,11 @@ function mod:TearUpdate(entityTear)
 	if player then
 		LudoCharge(entityTear)
 				--updating slight height and acceleration of tears from bowl
-		if entityTear.FrameCount == 1 and mod:GetData(entityTear).FromBowl then
+		--[[if entityTear.FrameCount == 1 and mod:GetData(entityTear).FromBowl then
 			local rng = player:GetCollectibleRNG(CollectibleType.COLLECTIBLE_BOWL_OF_TEARS)
 			entityTear.Height = mod:GetRandomNumber(-40,-24,rng)
 			entityTear.FallingAcceleration = 1 / mod:GetRandomNumber(1,5,rng)
-		end
+		end]]
 	end
 end
 mod:AddCallback(ModCallbacks.MC_POST_TEAR_UPDATE, mod.TearUpdate)
@@ -177,8 +177,11 @@ function mod:BowlShoot(player)
 			local shootVector = Vector.FromAngle(angle)
 			local charge = data.HoldingBowl ~= -1 and mod:GetCharge(player,data.HoldingBowl) or 6
 			for i= 1,mod:GetRandomNumber(charge+4,charge*2+4,rng) do
-				local angle = Vector(mod:GetRandomNumber(-2,2,rng),mod:GetRandomNumber(-2,2,rng))
-				local tear = player:FireTear(player.Position,shootVector*player.ShotSpeed*mod:GetRandomNumber(6,13,rng) + angle + player.Velocity,false,true,false,player)
+				--local angle = Vector(mod:GetRandomNumber(-2,2,rng),mod:GetRandomNumber(-2,2,rng))
+				local tear = player:FireTear(player.Position,(shootVector*player.ShotSpeed):Rotated(mod:GetRandomNumber(-10,10,rng))*mod:GetRandomNumber(6,10,rng) + player.Velocity,false,true,false,player)
+				tear.FallingSpeed = mod:GetRandomNumber(-15,-3, rng)
+                		tear.Height = mod:GetRandomNumber(-60,-40, rng)
+                		tear.FallingAcceleration = mod:GetRandomNumber(0.5,0.6, rng)
 				mod:GetData(tear).FromBowl = true
 			end
 			if data.HoldingBowl == -1 then
