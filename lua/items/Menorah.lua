@@ -1,15 +1,14 @@
-local mod = AntibirthItemPack
-function mod:onEvaluateCache(player, cacheFlag)
-	local data = mod:GetData(player)
+function AntibirthItemPack:onEvaluateCache(player, cacheFlag)
+	local data = AntibirthItemPack.GetEntityData(player)
 
 	if cacheFlag == CacheFlag.CACHE_FAMILIARS then
-		local numFamiliars = player:GetCollectibleNum(CollectibleType.COLLECTIBLE_MENORAH) + player:GetEffects():GetCollectibleEffectNum(CollectibleType.COLLECTIBLE_MENORAH)
+		local numFamiliars = player:GetCollectibleNum(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH) + player:GetEffects():GetCollectibleEffectNum(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH)
 		
-		player:CheckFamiliar(FamiliarVariant.MENORAH, numFamiliars, player:GetCollectibleRNG(CollectibleType.COLLECTIBLE_MENORAH), Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_MENORAH))	
+		player:CheckFamiliar(FamiliarVariant.MENORAH, numFamiliars, player:GetCollectibleRNG(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH), Isaac.GetItemConfig():GetCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH))	
 	end
 	
 	if cacheFlag == CacheFlag.CACHE_FIREDELAY then
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_MENORAH) then
+		if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH) then
 			if data.MenorahFlames then
 				if data.MenorahFlames > 0 then
 					player.MaxFireDelay = (player.MaxFireDelay / (data.SewingMachineDenominator or 2)) * (data.MenorahFlames + 1)		
@@ -36,12 +35,12 @@ local function isEven(number)
 	return number % 2 == 0
 end
 
-function mod:postFireTear(tear)
-	local player = mod:GetPlayerFromTear(tear)
-	local tearData = mod:GetData(tear)
+function AntibirthItemPack:postFireTear(tear)
+	local player = AntibirthItemPack:GetPlayerFromTear(tear)
+	local tearData = AntibirthItemPack:GetData(tear)
 	if player then
-		local data = mod:GetData(player)
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_MENORAH) then
+		local data = AntibirthItemPack.GetEntityData(player)
+		if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH) then
 			tear:Remove()
 			for i = 1, data.MenorahFlames do
 				local correctedVelocity = tear.Velocity
@@ -60,24 +59,24 @@ function mod:postFireTear(tear)
 				spreadTear.Velocity = correctedVelocity
 				
 				if tearData.FromBowl then
-					mod:GetData(spreadTear).FromBowl = true
+					AntibirthItemPack:GetData(spreadTear).FromBowl = true
 				end
 			end
 		end
 	end
 end
 
-function mod:onLaserUpdate(laser)
-	local player = mod:GetPlayerFromTear(laser)
-	local laserData = mod:GetData(laser)
+function AntibirthItemPack:onLaserUpdate(laser)
+	local player = AntibirthItemPack:GetPlayerFromTear(laser)
+	local laserData = AntibirthItemPack:GetData(laser)
 	
 	if player then
-		local data = mod:GetData(player)
+		local data = AntibirthItemPack.GetEntityData(player)
 		--if not laserData.isSpreadLaser then
-		--	mod:BrimstoneBowlCharge(laser)
+		--	AntibirthItemPack:BrimstoneBowlCharge(laser)
 		--end
 		
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_MENORAH) then
+		if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH) then
 			if (laser.FrameCount == 1) and (laser.Parent) then
 				if (not laserData.isSpreadLaser) and (laser.Parent:ToPlayer() or laserData.IsIncubusTear) then
 					if (laser.SubType == LaserSubType.LASER_SUBTYPE_LINEAR) and laser.Timeout ~= -1 then
@@ -94,7 +93,7 @@ function mod:onLaserUpdate(laser)
 								spreadLaser = EntityLaser.ShootAngle(laser.Variant, laser.Position, correctedVelocity, laser.Timeout, laser.PositionOffset, laser.Parent:ToFamiliar())
 							
 							end
-							mod:GetData(spreadLaser).isSpreadLaser = true
+							AntibirthItemPack:GetData(spreadLaser).isSpreadLaser = true
 							
 							spreadLaser.TearFlags = laser.TearFlags
 							spreadLaser:SetBlackHpDropChance(laser.BlackHpDropChance)
@@ -151,7 +150,7 @@ function mod:onLaserUpdate(laser)
 							elseif laserData.IsIncubusTear then
 								spreadLaser = player:FireTechXLaser(player.Position, correctedVelocity, laser.Radius, laser.Parent:ToFamiliar())
 							end
-							mod:GetData(spreadLaser).isSpreadLaser = true
+							AntibirthItemPack:GetData(spreadLaser).isSpreadLaser = true
 							
 							spreadLaser.TearFlags = laser.TearFlags
 							spreadLaser:SetBlackHpDropChance(laser.BlackHpDropChance)
@@ -183,16 +182,16 @@ function mod:onLaserUpdate(laser)
 	end
 end
 
-function mod:onBombUpdate(bomb)
-	local player = mod:GetPlayerFromTear(bomb)
-	local bombData = mod:GetData(bomb)
+function AntibirthItemPack:onBombUpdate(bomb)
+	local player = AntibirthItemPack:GetPlayerFromTear(bomb)
+	local bombData = AntibirthItemPack:GetData(bomb)
 	
 	if player then
-		local data = mod:GetData(player)
+		local data = AntibirthItemPack.GetEntityData(player)
 		--if bomb.FrameCount == 1 and not bombData.isSpreadBomb then 
-		--	mod:BombBowlCharge(bomb)
+		--	AntibirthItemPack:BombBowlCharge(bomb)
 		--end
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_MENORAH) then
+		if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH) then
 			if (bomb.FrameCount == 1) and (bomb.Parent) and (bomb.IsFetus == true) then
 				if (not bombData.isSpreadBomb) and (bomb.Parent:ToPlayer() or bombData.IsIncubusTear) then
 					for i = 1, data.MenorahFlames do
@@ -209,7 +208,7 @@ function mod:onBombUpdate(bomb)
 							--spreadBomb = player:FireBomb(bomb.Position, correctedVelocity, bomb.Parent:ToFamiliar())
 							spreadBomb = Isaac.Spawn(bomb.Type,bomb.Variant,bomb.SubType,bomb.Position,correctedVelocity,bomb.Parent:ToFamiliar()):ToBomb()
 						end
-						mod:GetData(spreadBomb).isSpreadBomb = true
+						AntibirthItemPack:GetData(spreadBomb).isSpreadBomb = true
 						
 						spreadBomb.ExplosionDamage = bomb.ExplosionDamage
 						spreadBomb.Flags = bomb.Flags
@@ -234,18 +233,20 @@ function mod:onBombUpdate(bomb)
 	end
 end
 
-function mod:onFamiliarInit(menorah)
+function AntibirthItemPack:onFamiliarInit(menorah)
 	local player = menorah.Player
-	local data = mod:GetData(player)
-	data.MenorahFlames = 1
+	local data = AntibirthItemPack.GetEntityData(player)
+	if not data.MenorahFlames then
+		data.MenorahFlames = 1
+	end
 	
 	menorah:AddToFollowers()
 end
 
-function mod:onFamiliarUpdate(menorah)
+function AntibirthItemPack:onFamiliarUpdate(menorah)
 	local sprite = menorah:GetSprite()
 	local player = menorah.Player
-	local data = mod:GetData(player)
+	local data = AntibirthItemPack.GetEntityData(player)
 		
 	if data.MenorahFlames == 1 then
 		sprite:Play("Idle1", false)
@@ -307,11 +308,11 @@ function mod:onFamiliarUpdate(menorah)
 	menorah:FollowParent()
 end
 
-function mod:onDamage(tookDamage, damageAmount, damageFlags, damageSource, damageCountdownFrames)
+function AntibirthItemPack:onDamage(tookDamage, damageAmount, damageFlags, damageSource, damageCountdownFrames)
 	local player = tookDamage:ToPlayer()
-	local data = mod:GetData(player)
+	local data = AntibirthItemPack.GetEntityData(player)
 		
-	if player:HasCollectible(CollectibleType.COLLECTIBLE_MENORAH) then
+	if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH) then
 		if data.MenorahFlames > 0 then
 			data.MenorahFlames = data.MenorahFlames + 1
 				
@@ -327,14 +328,14 @@ end
 
 
 if Sewn_API then
-	Sewn_API:MakeFamiliarAvailable(FamiliarVariant.MENORAH, CollectibleType.COLLECTIBLE_MENORAH)
+	Sewn_API:MakeFamiliarAvailable(FamiliarVariant.MENORAH, AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH)
 
 	local function MenorahSewingUpdateDefault(_, menorah)
-		local data = mod:GetData(menorah.Player)
+		local data = AntibirthItemPack.GetEntityData(menorah.Player)
 		data.SewingMachineDenominator = 3
 	end
 	local function MenorahSewingUpdateUltra(_, menorah)
-		local data = mod:GetData(menorah.Player)
+		local data = AntibirthItemPack.GetEntityData(menorah.Player)
 		data.SewingMachineDenominator = 4
 		data.SewingMachineUltra = true
 	end
@@ -343,10 +344,10 @@ if Sewn_API then
 	Sewn_API:AddCallback(Sewn_API.Enums.ModCallbacks.FAMILIAR_UPDATE, MenorahSewingUpdateUltra, FamiliarVariant.MENORAH,  Sewn_API.Enums.FamiliarLevelFlag.FLAG_ULTRA)
 end
 
-mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.onEvaluateCache)
-mod:AddCallback(ModCallbacks.MC_POST_FIRE_TEAR, mod.postFireTear)
-mod:AddCallback(ModCallbacks.MC_POST_LASER_UPDATE, mod.onLaserUpdate)
-mod:AddCallback(ModCallbacks.MC_POST_BOMB_UPDATE, mod.onBombUpdate)
-mod:AddCallback(ModCallbacks.MC_FAMILIAR_INIT, mod.onFamiliarInit, FamiliarVariant.MENORAH)
-mod:AddCallback(ModCallbacks.MC_FAMILIAR_UPDATE, mod.onFamiliarUpdate, FamiliarVariant.MENORAH)
-mod:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, mod.onDamage, EntityType.ENTITY_PLAYER)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, AntibirthItemPack.onEvaluateCache)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_FIRE_TEAR, AntibirthItemPack.postFireTear)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_LASER_UPDATE, AntibirthItemPack.onLaserUpdate)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_BOMB_UPDATE, AntibirthItemPack.onBombUpdate)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_FAMILIAR_INIT, AntibirthItemPack.onFamiliarInit, FamiliarVariant.MENORAH)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_FAMILIAR_UPDATE, AntibirthItemPack.onFamiliarUpdate, FamiliarVariant.MENORAH)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, AntibirthItemPack.onDamage, EntityType.ENTITY_PLAYER)

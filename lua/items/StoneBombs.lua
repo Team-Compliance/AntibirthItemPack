@@ -7,15 +7,15 @@ local directions = {
 	270
 }
 
-function mod:SB_BombUpdate(bomb)
-	local player = mod:GetPlayerFromTear(bomb)
-	local data = mod:GetData(bomb)
+function AntibirthItemPack:SB_BombUpdate(bomb)
+	local player = AntibirthItemPack:GetPlayerFromTear(bomb)
+	local data = AntibirthItemPack:GetData(bomb)
 	
 	if player then
 		if bomb.FrameCount == 1 then
 			if bomb.Type == EntityType.ENTITY_BOMB then
 				if bomb.Variant ~= BombVariant.BOMB_THROWABLE then
-					if player:HasCollectible(CollectibleType.COLLECTIBLE_STONE_BOMBS) then
+					if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_STONE_BOMBS) then
 						if data.isStoneBomb == nil then
 							data.isStoneBomb = true
 						end
@@ -42,13 +42,13 @@ function mod:SB_BombUpdate(bomb)
 		end
 		
 		if sprite:IsPlaying("Explode") then
-			mod:SB_Explode(bomb, player)
+			AntibirthItemPack:SB_Explode(bomb, player)
 		end
 	end
 end
-mod:AddCallback(ModCallbacks.MC_POST_BOMB_UPDATE, mod.SB_BombUpdate)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_BOMB_UPDATE, AntibirthItemPack.SB_BombUpdate)
 
-function mod:SB_Explode(bomb, player)
+function AntibirthItemPack:SB_Explode(bomb, player)
 	for _, dir in pairs(directions) do
 		local crackwave = Isaac.Spawn(EntityType.ENTITY_EFFECT, EffectVariant.CRACKWAVE, 1, bomb.Position, bomb.Velocity, player)
 		crackwave:ToEffect().Rotation = dir

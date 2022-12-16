@@ -1,8 +1,6 @@
-local mod = AntibirthItemPack
-
-function mod:UseBookOfDespair(_Type, RNG, player, flags, slot, data)
+function AntibirthItemPack:UseBookOfDespair(_Type, RNG, player, flags, slot, data)
 	if flags & UseFlag.USE_CARBATTERY == 0 then
-		local tempEffects = player:GetEffects():GetCollectibleEffectNum(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
+		local tempEffects = player:GetEffects():GetCollectibleEffectNum(AntibirthItemPack.CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
 		if GiantBookAPI and tempEffects == 0 then
 			GiantBookAPI.playGiantBook("Appear", "Despair.png", Color(228/255, 228/255, 228/255, 1, 0, 0, 0), Color(228/255, 228/255, 228/255, 153/255, 0, 0, 0), Color(225/255, 225/255, 225/255, 128/255, 0, 0, 0))
 		end
@@ -12,8 +10,8 @@ function mod:UseBookOfDespair(_Type, RNG, player, flags, slot, data)
 	return true
 end
 
-function mod:Despair_CacheEval(player, cacheFlag)
-	local tempEffects = player:GetEffects():GetCollectibleEffectNum(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
+function AntibirthItemPack:Despair_CacheEval(player, cacheFlag)
+	local tempEffects = player:GetEffects():GetCollectibleEffectNum(AntibirthItemPack.CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
 	
 	if tempEffects > 0 then
 		for count = 1, tempEffects do
@@ -27,5 +25,5 @@ function mod:Despair_CacheEval(player, cacheFlag)
 	end
 end
 
-mod:AddCallback(ModCallbacks.MC_USE_ITEM, mod.UseBookOfDespair, CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
-mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.Despair_CacheEval, CacheFlag.CACHE_FIREDELAY)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_USE_ITEM, AntibirthItemPack.UseBookOfDespair, AntibirthItemPack.CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, AntibirthItemPack.Despair_CacheEval, CacheFlag.CACHE_FIREDELAY)

@@ -1,2 +1,0 @@
---Book of Despair
-ExtraBirthright.AddBookToBirthrightEffect(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)

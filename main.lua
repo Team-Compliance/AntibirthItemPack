@@ -1,41 +1,93 @@
 AntibirthItemPack = RegisterMod("Antibirth Item Pack", 1)
-local mod = AntibirthItemPack
+local json = require("json")
 
-CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR = Isaac.GetItemIdByName("Book of Despair")
-CollectibleType.COLLECTIBLE_BOWL_OF_TEARS = Isaac.GetItemIdByName("Bowl of Tears")
-CollectibleType.COLLECTIBLE_DONKEY_JAWBONE = Isaac.GetItemIdByName("Donkey Jawbone")
-CollectibleType.COLLECTIBLE_MENORAH = Isaac.GetItemIdByName("Menorah")
-CollectibleType.COLLECTIBLE_STONE_BOMBS = Isaac.GetItemIdByName("Stone Bombs")
+AntibirthItemPack.CollectibleType = {
+	COLLECTIBLE_BOOK_OF_DESPAIR = Isaac.GetItemIdByName("Book of Despair"),
+	COLLECTIBLE_BOWL_OF_TEARS = Isaac.GetItemIdByName("Bowl of Tears"),
+	COLLECTIBLE_DONKEY_JAWBONE = Isaac.GetItemIdByName("Donkey Jawbone"),
+	COLLECTIBLE_MENORAH = Isaac.GetItemIdByName("Menorah"),
+	COLLECTIBLE_STONE_BOMBS = Isaac.GetItemIdByName("Stone Bombs")
+}
 
-include("lua/items/BookOfDespair.lua")
-include("lua/items/BowlOfTears.lua")
-include("lua/items/DonkeyJawbone.lua")
-include("lua/items/Menorah.lua")
-include("lua/items/StoneBombs.lua")
+AntibirthItemPack.PlayerPersistentData = {}
+AntibirthItemPack.RunPersistentData = {}
 
-mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, function(self)
-	if CCO and CCO.JOB_MOD then
-		Game():GetItemPool():RemoveCollectible(CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR) --remove our book of despair if job mod is detected
-	end
-end)
+--Amazing save manager
+local continue = false
+local function IsContinue()
+    local totPlayers = #Isaac.FindByType(EntityType.ENTITY_PLAYER)
 
-if EID then
-	include("lua/eid.lua")
+    if totPlayers == 0 then
+        if Game():GetFrameCount() == 0 then
+            continue = false
+        else
+            local room = Game():GetRoom()
+            local desc = Game():GetLevel():GetCurrentRoomDesc()
+
+            if desc.SafeGridIndex == GridRooms.ROOM_GENESIS_IDX then
+                if not room:IsFirstVisit() then
+                    continue = true
+                else
+                    continue = false
+                end
+            else
+                continue = true
+            end
+        end
+    end
+
+    return continue
 end
 
-if Encyclopedia then
-	include("lua/encyclopedia.lua")
-end
 
-if MiniMapiItemsAPI then
-	include("lua/MiniMapiItemsAPI.lua")
+function AntibirthItemPack:OnPlayerInit()
+    if #Isaac.FindByType(EntityType.ENTITY_PLAYER) ~= 0 then return end
+
+    Isaac.ExecuteCommand("reloadshaders")
+
+    local isContinue = IsContinue()
+    if isContinue and AntibirthItemPack:HasData() then
+        local loadedData = json.decode(AntibirthItemPack:LoadData())
+        AntibirthItemPack.RunPersistentData = loadedData.RunPersistentData
+        AntibirthItemPack.PlayerPersistentData = loadedData.PlayerPersistentData
+		for _,p in pairs(AntibirthItemPack.PlayerPersistentData) do
+			for k,t in pairs(p) do
+				print(k.." -- "..t)
+			end
+		end
+    else
+        if AntibirthItemPack:HasData() then
+            local loadedData = json.decode(AntibirthItemPack:LoadData())
+            AntibirthItemPack.PlayerPersistentData = loadedData.PlayerPersistentData
+            AntibirthItemPack.RunPersistentData = loadedData.RunPersistentData
+        end
+
+        if not AntibirthItemPack.RunPersistentData or not AntibirthItemPack.RunPersistentData.DisabledItems then
+            AntibirthItemPack.RunPersistentData = {}
+            AntibirthItemPack.RunPersistentData.DisabledItems = {}
+        end
+
+		AntibirthItemPack.PlayerPersistentData = {}
+    end
 end
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, AntibirthItemPack.OnPlayerInit)
+
+function AntibirthItemPack:OnGameExit()
+    local saveData = {
+        PlayerPersistentData = AntibirthItemPack.PlayerPersistentData,
+        RunPersistentData = AntibirthItemPack.RunPersistentData
+    }
+
+    local jsonString = json.encode(saveData)
+    AntibirthItemPack:SaveData(jsonString)
+end
+AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, AntibirthItemPack.OnGameExit)
 
 -----------------------------------
 --Helper Functions (thanks piber)--
 -----------------------------------
 
-function mod:GetPlayers(functionCheck, ...)
+function AntibirthItemPack:GetPlayers(functionCheck, ...)
 	local args = {...}
 	local players = {}
 	local game = Game()
@@ -66,13 +118,13 @@ function mod:GetPlayers(functionCheck, ...)
 	return players
 end
 
-function mod:GetPlayerFromTear(tear)
-	local check = tear.Parent or mod:GetSpawner(tear) or tear.SpawnerEntity
+function AntibirthItemPack:GetPlayerFromTear(tear)
+	local check = tear.Parent or AntibirthItemPack:GetSpawner(tear) or tear.SpawnerEntity
 	if check then
 		if check.Type == EntityType.ENTITY_PLAYER then
-			return mod:GetPtrHashEntity(check):ToPlayer()
+			return AntibirthItemPack:GetPtrHashEntity(check):ToPlayer()
 		elseif check.Type == EntityType.ENTITY_FAMILIAR and check.Variant == FamiliarVariant.INCUBUS then
-			local data = mod:GetData(tear)
+			local data = AntibirthItemPack:GetData(tear)
 			data.IsIncubusTear = true
 			return check:ToFamiliar().Player:ToPlayer()
 		end
@@ -80,26 +132,26 @@ function mod:GetPlayerFromTear(tear)
 	return nil
 end
 
-function mod:GetSpawner(entity)
+function AntibirthItemPack:GetSpawner(entity)
 	if entity and entity.GetData then
-		local spawnData = mod:GetSpawnData(entity)
+		local spawnData = AntibirthItemPack:GetSpawnData(entity)
 		if spawnData and spawnData.SpawnerEntity then
-			local spawner = mod:GetPtrHashEntity(spawnData.SpawnerEntity)
+			local spawner = AntibirthItemPack:GetPtrHashEntity(spawnData.SpawnerEntity)
 			return spawner
 		end
 	end
 	return nil
 end
 
-function mod:GetSpawnData(entity)
+function AntibirthItemPack:GetSpawnData(entity)
 	if entity and entity.GetData then
-		local data = mod:GetData(entity)
+		local data = AntibirthItemPack:GetData(entity)
 		return data.SpawnData
 	end
 	return nil
 end
 
-function mod:GetPtrHashEntity(entity)
+function AntibirthItemPack:GetPtrHashEntity(entity)
 	if entity then
 		if entity.Entity then
 			entity = entity.Entity
@@ -113,7 +165,7 @@ function mod:GetPtrHashEntity(entity)
 	return nil
 end
 
-function mod:GetData(entity)
+function AntibirthItemPack:GetData(entity)
 	if entity and entity.GetData then
 		local data = entity:GetData()
 		if not data.AntibirthItemPack then
@@ -125,7 +177,7 @@ function mod:GetData(entity)
 end
 
 local entitySpawnData = {}
-mod:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, function(_, type, variant, subType, position, velocity, spawner, seed)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, function(_, type, variant, subType, position, velocity, spawner, seed)
 	entitySpawnData[seed] = {
 		Type = type,
 		Variant = variant,
@@ -136,20 +188,20 @@ mod:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, function(_, type, variant, sub
 		InitSeed = seed
 	}
 end)
-mod:AddCallback(ModCallbacks.MC_POST_TEAR_INIT, function(_, entity)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_TEAR_INIT, function(_, entity)
 	local seed = entity.InitSeed
-	local data = mod:GetData(entity)
+	local data = AntibirthItemPack:GetData(entity)
 	data.SpawnData = entitySpawnData[seed]
 end)
-mod:AddCallback(ModCallbacks.MC_POST_ENTITY_REMOVE, function(_, entity)
-	local data = mod:GetData(entity)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_ENTITY_REMOVE, function(_, entity)
+	local data = AntibirthItemPack:GetData(entity)
 	data.SpawnData = nil
 end)
-mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, function()
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, function()
 	entitySpawnData = {}
 end)
 
-function mod:GetRandomNumber(numMin, numMax, rng)
+function AntibirthItemPack:GetRandomNumber(numMin, numMax, rng)
 	if not numMax then
 		numMax = numMin
 		numMin = nil
@@ -169,4 +221,48 @@ function mod:GetRandomNumber(numMin, numMax, rng)
 		return rng:Next() % numMin
 	end
 	return rng:Next()
+end
+
+function AntibirthItemPack.GetEntityData(entity)
+	if entity then
+		if entity.Type == EntityType.ENTITY_PLAYER then
+			local player = entity:ToPlayer()
+			if player:GetPlayerType() == PlayerType.PLAYER_THESOUL_B then
+				player = player:GetOtherTwin()
+			end
+			local id = 1
+			if player:GetPlayerType() == PlayerType.PLAYER_LAZARUS2_B then
+				id = 2
+			end
+			local index = tostring(player:GetCollectibleRNG(id):GetSeed())
+			if not AntibirthItemPack.PlayerPersistentData[index] then
+				AntibirthItemPack.PlayerPersistentData[index] = {}
+			end
+			return AntibirthItemPack.PlayerPersistentData[index]
+		end
+	end
+	return nil
+end
+
+
+include("lua.lib.DSSMenu")
+
+include("lua.BlockDisabledItems")
+
+include("lua.items.BookOfDespair")
+include("lua.items.BowlOfTears")
+include("lua.items.DonkeyJawbone")
+include("lua.items.Menorah")
+include("lua.items.StoneBombs")
+
+if EID then
+	include("lua.mod_compat.eid")
+end
+
+if Encyclopedia then
+	include("lua.mod_compat.encyclopedia")
+end
+
+if MiniMapiItemsAPI then
+	include("lua.mod_compat.MiniMapiItemsAPI")
 end
