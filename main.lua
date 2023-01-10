@@ -87,6 +87,17 @@ AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, AntibirthItemPack.O
 --Helper Functions (thanks piber)--
 -----------------------------------
 
+local PlayerTearFamiliars = {
+    [FamiliarVariant.CAINS_OTHER_EYE] = true,
+    [FamiliarVariant.SCISSORS] = true,
+    [FamiliarVariant.INCUBUS] = true,
+    --[FamiliarVariant.FATES_REWARD] = true,
+    [FamiliarVariant.SPRINKLER] = true,
+    [FamiliarVariant.TWISTED_BABY] = true,
+    [FamiliarVariant.BLOOD_BABY] = true,
+    [FamiliarVariant.DECAP_ATTACK] = true
+}
+
 function AntibirthItemPack:GetPlayers(functionCheck, ...)
 	local args = {...}
 	local players = {}
@@ -123,9 +134,9 @@ function AntibirthItemPack:GetPlayerFromTear(tear)
 	if check then
 		if check.Type == EntityType.ENTITY_PLAYER then
 			return AntibirthItemPack:GetPtrHashEntity(check):ToPlayer()
-		elseif check.Type == EntityType.ENTITY_FAMILIAR and check.Variant == FamiliarVariant.INCUBUS then
+		elseif check.Type == EntityType.ENTITY_FAMILIAR and PlayerTearFamiliars[check.Variant] then
 			local data = AntibirthItemPack:GetData(tear)
-			data.IsIncubusTear = true
+			data.IsFamiliarPlayerTear = true
 			return check:ToFamiliar().Player:ToPlayer()
 		end
 	end
@@ -229,6 +240,9 @@ function AntibirthItemPack.GetEntityData(entity)
 			local player = entity:ToPlayer()
 			if player:GetPlayerType() == PlayerType.PLAYER_THESOUL_B then
 				player = player:GetOtherTwin()
+			end
+			if player.Parent then
+				player = player.Parent:ToPlayer()
 			end
 			local id = 1
 			if player:GetPlayerType() == PlayerType.PLAYER_LAZARUS2_B then

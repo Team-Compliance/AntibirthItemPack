@@ -78,7 +78,7 @@ function AntibirthItemPack:onLaserUpdate(laser)
 		
 		if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH) then
 			if (laser.FrameCount == 1) and (laser.Parent) then
-				if (not laserData.isSpreadLaser) and (laser.Parent:ToPlayer() or laserData.IsIncubusTear) then
+				if (not laserData.isSpreadLaser) and (laser.Parent:ToPlayer() or laserData.IsFamiliarPlayerTear) then
 					if (laser.SubType == LaserSubType.LASER_SUBTYPE_LINEAR) and laser.Timeout ~= -1 then
 						for i = 2, data.MenorahFlames do
 							local correctedVelocity = laser.StartAngleDegrees - ((i-1) * 3)
@@ -87,9 +87,9 @@ function AntibirthItemPack:onLaserUpdate(laser)
 							end
 
 							local spreadLaser = nil
-							if not laserData.IsIncubusTear then
+							if not laserData.IsFamiliarPlayerTear then
 								spreadLaser = EntityLaser.ShootAngle(laser.Variant, laser.Position, correctedVelocity, laser.Timeout, laser.PositionOffset, player)
-							elseif laserData.IsIncubusTear then
+							elseif laserData.IsFamiliarPlayerTear then
 								spreadLaser = EntityLaser.ShootAngle(laser.Variant, laser.Position, correctedVelocity, laser.Timeout, laser.PositionOffset, laser.Parent:ToFamiliar())
 							
 							end
@@ -145,9 +145,9 @@ function AntibirthItemPack:onLaserUpdate(laser)
 							end
 
 							local spreadLaser = nil
-							if not laserData.IsIncubusTear then
+							if not laserData.IsFamiliarPlayerTear then
 								spreadLaser = player:FireTechXLaser(player.Position, correctedVelocity, laser.Radius, player)
-							elseif laserData.IsIncubusTear then
+							elseif laserData.IsFamiliarPlayerTear then
 								spreadLaser = player:FireTechXLaser(player.Position, correctedVelocity, laser.Radius, laser.Parent:ToFamiliar())
 							end
 							AntibirthItemPack:GetData(spreadLaser).isSpreadLaser = true
@@ -193,7 +193,7 @@ function AntibirthItemPack:onBombUpdate(bomb)
 		--end
 		if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH) then
 			if (bomb.FrameCount == 1) and (bomb.Parent) and (bomb.IsFetus == true) then
-				if (not bombData.isSpreadBomb) and (bomb.Parent:ToPlayer() or bombData.IsIncubusTear) then
+				if (not bombData.isSpreadBomb) and (bomb.Parent:ToPlayer() or bombData.IsFamiliarPlayerTear) then
 					for i = 1, data.MenorahFlames do
 						local correctedVelocity = bomb.Velocity:Rotated((i-1) * -3)
 						if i % 2 == 0 then
@@ -201,10 +201,10 @@ function AntibirthItemPack:onBombUpdate(bomb)
 						end
 						
 						local spreadBomb = nil
-						if not bombData.IsIncubusTear then
+						if not bombData.IsFamiliarPlayerTear then
 							--spreadBomb = player:FireBomb(bomb.Position, correctedVelocity, player)
 							spreadBomb = Isaac.Spawn(bomb.Type,bomb.Variant,bomb.SubType,bomb.Position,correctedVelocity,player):ToBomb()
-						elseif bombData.IsIncubusTear then
+						elseif bombData.IsFamiliarPlayerTear then
 							--spreadBomb = player:FireBomb(bomb.Position, correctedVelocity, bomb.Parent:ToFamiliar())
 							spreadBomb = Isaac.Spawn(bomb.Type,bomb.Variant,bomb.SubType,bomb.Position,correctedVelocity,bomb.Parent:ToFamiliar()):ToBomb()
 						end
