@@ -1,4 +1,3 @@
-LaserVariant = {BRIMSTONE = 1, TECHNOLOGY = 2, MEGA_BLAST = 6,  TECH_BRIMSTONE = 9, TECH_ZERO = 10, BIG_BRIM = 11, TECHSTONE = 14}
 BowlMouseClick = {LEFT = 0, RIGHT = 1, WHEEL = 2, BACK = 3, FORWARD = 4}
 
 local function FireTear(player)
