@@ -1,4 +1,3 @@
----@diagnostic disable: cast-local-type
 return function(DSSModName, DSSCoreVersion, MenuProvider)
 
     local dssmod = RegisterMod(DSSModName, 1)
@@ -1168,6 +1167,14 @@ return function(DSSModName, DSSCoreVersion, MenuProvider)
 
             allnosel = true
             for i, button in ipairs(buttons) do
+                if button.originalnosel == nil then
+                    if button.nosel == nil then
+                        button.originalnosel = false
+                    else
+                        button.originalnosel = button.nosel
+                    end
+                end
+
                 button.selected = false
                 if button.generate and itemswitched then
                     button.generate(button, item, tbl)
@@ -1182,7 +1189,7 @@ return function(DSSModName, DSSCoreVersion, MenuProvider)
                         button.nosel = true
                         button.forcenodisplay = true
                     elseif button.forcenodisplay then
-                        button.nosel = nil
+                        button.nosel = button.originalnosel
                         button.forcenodisplay = nil
                     end
                 end
