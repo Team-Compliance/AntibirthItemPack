@@ -96,7 +96,7 @@ local Wiki = {
 }
 
 Encyclopedia.AddItem({
-	ID = CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR,
+	ID = AntibirthItemPack.CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR,
 	WikiDesc = Wiki.BookOfDespair,
 	Pools = {
 	  	Encyclopedia.ItemPools.POOL_LIBRARY,
@@ -107,7 +107,7 @@ Encyclopedia.AddItem({
 })
 
 Encyclopedia.AddItem({
-	ID = CollectibleType.COLLECTIBLE_BOWL_OF_TEARS,
+	ID = AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS,
 	WikiDesc = Wiki.BowlOfTears,
 	Pools = {
 		Encyclopedia.ItemPools.POOL_ANGEL,
@@ -116,7 +116,7 @@ Encyclopedia.AddItem({
 })
 
 Encyclopedia.AddItem({
-	ID = CollectibleType.COLLECTIBLE_DONKEY_JAWBONE,
+	ID = AntibirthItemPack.CollectibleType.COLLECTIBLE_DONKEY_JAWBONE,
 	WikiDesc = Wiki.DonkeyJawbone,
 	Pools = {
 		Encyclopedia.ItemPools.POOL_TREASURE,
@@ -125,7 +125,7 @@ Encyclopedia.AddItem({
 })
 
 Encyclopedia.AddItem({
-	ID = CollectibleType.COLLECTIBLE_MENORAH,
+	ID = AntibirthItemPack.CollectibleType.COLLECTIBLE_MENORAH,
 	WikiDesc = Wiki.Menorah,
 	Pools = {
 		Encyclopedia.ItemPools.POOL_ANGEL,
@@ -134,7 +134,7 @@ Encyclopedia.AddItem({
 })
 
 Encyclopedia.AddItem({
-	ID = CollectibleType.COLLECTIBLE_STONE_BOMBS,
+	ID = AntibirthItemPack.CollectibleType.COLLECTIBLE_STONE_BOMBS,
 	WikiDesc = Wiki.StoneBombs,
 	Pools = {
 		Encyclopedia.ItemPools.POOL_BOMB_BUM,
