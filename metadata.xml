@@ -1,4 +1,4 @@
-<?xml version="3.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <metadata>
     <name>Antibirth Item Pack</name>
     <directory>antibirth item pack</directory>
@@ -29,15 +29,15 @@
 [img]https://i.imgur.com/0YXOqPH.png[/img]
 [list]
 [*][u]𝐃𝐢𝐫𝐞𝐜𝐭𝐨𝐫 𝐚𝐧𝐝 𝐆𝐫𝐚𝐩𝐡𝐢𝐜 𝐃𝐞𝐬𝐢𝐠𝐧𝐞𝐫[/u] = Sillst
-[*][u]𝐏𝐫𝐨𝐠𝐫𝐚𝐦𝐦𝐞𝐫𝐬[/u] = kittenchilly, BrakeDude, anchikai.
+[*][u]𝐏𝐫𝐨𝐠𝐫𝐚𝐦𝐦𝐞𝐫𝐬[/u] = kittenchilly, BrakeDude
 [*][u]𝐒𝐩𝐫𝐢𝐭𝐞𝐫[/u] = Michael¿?
 [*][u]𝐀𝐫𝐭𝐢𝐬𝐭[/u] = cat,,
 [*][u]𝐓𝐫𝐚𝐧𝐬𝐥𝐚𝐭𝐨𝐫𝐬[/u] = Kotry, BrakeDude
-[*][u]𝐏𝐥𝐚𝐲𝐭𝐞𝐬𝐭𝐞𝐫𝐬[/u] = kittenchilly, Sillst, BrakeDude, anchikai. Luigi_Gamer124, Blixy, Blind the Bound Demon
+[*][u]𝐏𝐥𝐚𝐲𝐭𝐞𝐬𝐭𝐞𝐫𝐬[/u] = kittenchilly, Sillst, BrakeDude, Luigi_Gamer124, Blixy, Blind the Bound Demon
 [/list]
 
 [img]https://i.imgur.com/3en8OyU.png[/img]
-[code]Aether, Akad, ALADAR, anchikai., Blind the Bound Demon, Blixy, BrakeDude, cat,,, Firework, fly_6, Goncholito, jubbalub, KitsuneMedia, kittenchilly, Luigi124, Merlin, Michael¿?, PixelPlz, poody_blue, Royal, Sillst, skippy, The Demisemihemidemisemiquaver[/code]]
+[code]Aether, Akad, ALADAR, Andre Doruk, Blind the Bound Demon, Blixy, BrakeDude, cat,,, Firework, fly_6, Goncholito, im_tem, Kars, KitsuneMedia, kittenchilly, Kotry, lambchop_is_ok, Luigi124, Michael¿?, PixelPlz, poody_blue, Sillst, sinbiscuit, Soaring__Sky, The Demisemihemidemisemiquaver[/code]
 
 [img]https://i.imgur.com/SlXbHql.png[/img] [img]https://i.imgur.com/xd2eafr.png[/img]
 [code][u]Community Remix mod[/u] - Creating the original concepts for Book of Despair and Donkey Jawbone
@@ -52,7 +52,7 @@
 [img]https://i.imgur.com/jBFg02x.png[/img] [url=https://twitter.com/ComplianceMods]Compliance Twitter Account[/url] [img]https://i.imgur.com/jBFg02x.png[/img]
 
 [img]https://i.imgur.com/DVq7svp.png[/img]</description>
-    <version>3.0</version>
+    <version>3.1</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Items"/>
