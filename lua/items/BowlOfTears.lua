@@ -33,7 +33,7 @@ AntibirthItemPack:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, AntibirthItemPack
 function AntibirthItemPack:BowlShoot(player)
 	local data = AntibirthItemPack:GetData(player)
 	local rng = player:GetCollectibleRNG(AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS)
-	if not data.HoldingBowl ~= -1 then
+	if data.HoldingBowl ~= -1 then
 		if player:GetActiveItem(ActiveSlot.SLOT_SECONDARY) == AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS and data.HoldingBowl then
 			data.HoldingBowl = nil
 			player:AnimateCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS, "HideItem", "PlayerPickup")
@@ -66,17 +66,17 @@ function AntibirthItemPack:BowlShoot(player)
 			if data.HoldingBowl == -1 then
 				for slot = 0,2 do
 					if player:GetActiveItem(slot) == AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS then
-						if charge < 6 then
-							player:SetSoulCharge(player:GetSoulCharge() - 6 + charge)
-							player:SetBloodCharge(player:GetBloodCharge() - 6 + charge)
+						if charge < 1 then
+							player:SetSoulCharge(player:GetSoulCharge() - 1 + charge)
+							player:SetBloodCharge(player:GetBloodCharge() - 1 + charge)
 						end
 						player:SetActiveCharge(0,slot)
 					end
 				end
 			elseif data.HoldingBowl ~= -1 then
-				if charge < 6 then
-					player:SetSoulCharge(player:GetSoulCharge() - 6 + charge)
-					player:SetBloodCharge(player:GetBloodCharge() - 6 + charge)
+				if charge < 1 then
+					player:SetSoulCharge(player:GetSoulCharge() - 1 + charge)
+					player:SetBloodCharge(player:GetBloodCharge() - 1 + charge)
 				end
 				player:SetActiveCharge(0,data.HoldingBowl)
 			end
@@ -91,6 +91,31 @@ function AntibirthItemPack:BowlShoot(player)
 	end
 end
 AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, AntibirthItemPack.BowlShoot)
+
+
+--self explanatory
+function AntibirthItemPack:GetCharge(player,slot)
+	return player:GetActiveCharge(slot) + player:GetBatteryCharge(slot)
+end
+
+--hud and sfx reactions in all slots
+function AntibirthItemPack:ChargeBowl(player)
+	for slot = 0,2 do
+		if player:GetActiveItem(slot) == AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS then
+			local charge = AntibirthItemPack:GetCharge(player,slot)
+			local battery = player:HasCollectible(CollectibleType.COLLECTIBLE_BATTERY)
+			if not battery and charge < 1 or battery and charge < 2 then
+				player:SetActiveCharge(charge+1,slot)
+				Game():GetHUD():FlashChargeBar(player,slot)
+				if charge == 0 or charge == 11 then
+					SFXManager():Play(SoundEffect.SOUND_ITEMRECHARGE)
+				else
+					SFXManager():Play(SoundEffect.SOUND_BEEP)
+				end
+			end
+		end
+	end
+end
 
 function AntibirthItemPack:WispUpdate(wisp)
 	local player = wisp.Player
