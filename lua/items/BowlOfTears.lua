@@ -61,7 +61,7 @@ function AntibirthItemPack:BowlShoot(player)
 				tear.FallingSpeed = AntibirthItemPack:GetRandomNumber(-15,-3, rng)
                 		tear.Height = AntibirthItemPack:GetRandomNumber(-60,-40, rng)
                 		tear.FallingAcceleration = AntibirthItemPack:GetRandomNumber(0.5,0.6, rng)
-						tear.BaseDamage = player.Damage + 15
+						tear.CollisionDamage = player.Damage + 15
 				AntibirthItemPack:GetData(tear).FromBowl = true
 			end
 			if data.HoldingBowl == -1 then
