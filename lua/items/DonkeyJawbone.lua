@@ -61,7 +61,7 @@ function AntibirthItemPack:SpawnJawbone(player)
 	jawbone.EntityCollisionClass = EntityCollisionClass.ENTCOLL_ENEMIES
 	jawbone.GridCollisionClass = GridCollisionClass.COLLISION_SOLID
 	jawbone.CollisionDamage = (player.Damage * 8) + 10
-	jawbone:AddTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_SPECTRAL | TearFlags.TEAR_SHIELDED | TearFlags.TEAR_HP_DROP | TearFlags.TEAR_EXTRA_GORE)
+	jawbone:AddTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_SPECTRAL | TearFlags.TEAR_SHIELDED | TearFlags.TEAR_EXTRA_GORE)
 	if player:HasCollectible(CollectibleType.COLLECTIBLE_IPECAC) then
 		jawbone:AddTearFlags(TearFlags.TEAR_POISON)
 	end
