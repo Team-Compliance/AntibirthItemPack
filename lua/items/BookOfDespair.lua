@@ -12,16 +12,14 @@ end
 
 function AntibirthItemPack:Despair_CacheEval(player, cacheFlag)
 	local tempEffects = player:GetEffects():GetCollectibleEffectNum(AntibirthItemPack.CollectibleType.COLLECTIBLE_BOOK_OF_DESPAIR)
-	
 	if tempEffects > 0 then
+		local currentTears = 30 / (player.MaxFireDelay + 1)
+		local usesMul = 0
 		for count = 1, tempEffects do
-			local currentTears = 30 / (player.MaxFireDelay + 1)
-			local newTears = currentTears * 2
-			if count > 1 then
-				newTears = currentTears * 1.5
-			end
-			player.MaxFireDelay = math.max((30 / newTears) - 1, -0.75)
+			usesMul = usesMul + (2 / count)
 		end
+		local newTears = currentTears * usesMul
+		player.MaxFireDelay = math.max((30 / newTears) - 1, -0.75)
 	end
 end
 
