@@ -55,7 +55,7 @@ AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_TEAR_COLLISION, AntibirthItemP
 function AntibirthItemPack:SpawnJawbone(player)
 	local jawbone = Isaac.Spawn(2, 1001, 0, player.Position, Vector.Zero, player):ToTear()
 	local data = AntibirthItemPack:GetData(jawbone)
-	local tearReflecting = math.random(100)
+	
 	
 	data.isJawbone = true
 	jawbone.Parent = player
@@ -96,6 +96,7 @@ function AntibirthItemPack:SpawnJawbone(player)
 	
 	for i, entity in pairs(Isaac.FindInRadius(jawbone.Position, 120)) do -- tear reflecting 
 		if entity.Type == EntityType.ENTITY_PROJECTILE and entity.SpawnerType ~= EntityType.ENTITY_PLAYER then
+			local tearReflecting = math.random(100)
 			local angle = ((player.Position - entity.Position) * -1):GetAngleDegrees()
 			for i = 0, 0 do
 				if (sprite:IsPlaying("SpinLeft") or sprite:IsPlaying("SpinUp") or sprite:IsPlaying("SpinRight") or sprite:IsPlaying("SpinDown")) and  entity:Exists() and tearReflecting <= 25 then
@@ -104,6 +105,26 @@ function AntibirthItemPack:SpawnJawbone(player)
 			end
 			entity:Remove()
 		end
-		
+	end
+	
+	for i, entity in pairs(Isaac.FindInRadius(jawbone.Position, 120, EntityPartition.ENEMY)) do -- Spawning dissapearing hearts and adding bleed effect to enemies
+		if entity:IsActiveEnemy() then
+			local heartSpawnChance = math.random(100)
+			local heartSpawn = nil
+			if entity.HitPoints < jawbone.CollisionDamage then
+				if not entity:IsBoss() then
+					if heartSpawnChance > 1 and heartSpawnChance <= 9 then
+						print("mierda")
+						heartSpawn = Isaac.Spawn(5, 10, 2, entity.Position, Vector.Zero, player):ToPickup()
+						heartSpawn.Timeout = 60
+					elseif heartSpawnChance <= 1 then
+						heartSpawn = Isaac.Spawn(5, 10, 1, entity.Position, Vector.Zero, player):ToPickup()
+						heartSpawn.Timeout = 60
+					end
+				end
+			else
+				entity:AddEntityFlags(EntityFlag.FLAG_BLEED_OUT)
+			end
+		end
 	end
 end
