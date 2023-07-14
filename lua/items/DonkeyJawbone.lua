@@ -55,13 +55,14 @@ AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_TEAR_COLLISION, AntibirthItemP
 function AntibirthItemPack:SpawnJawbone(player)
 	local jawbone = Isaac.Spawn(2, 1001, 0, player.Position, Vector.Zero, player):ToTear()
 	local data = AntibirthItemPack:GetData(jawbone)
+	local tearReflecting = math.random(100)
 	
 	data.isJawbone = true
 	jawbone.Parent = player
 	jawbone.EntityCollisionClass = EntityCollisionClass.ENTCOLL_ENEMIES
 	jawbone.GridCollisionClass = GridCollisionClass.COLLISION_SOLID
 	jawbone.CollisionDamage = (player.Damage * 8) + 10
-	jawbone:AddTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_SPECTRAL | TearFlags.TEAR_SHIELDED | TearFlags.TEAR_EXTRA_GORE)
+	jawbone:AddTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_SPECTRAL | TearFlags.TEAR_EXTRA_GORE)
 	if player:HasCollectible(CollectibleType.COLLECTIBLE_IPECAC) then
 		jawbone:AddTearFlags(TearFlags.TEAR_POISON)
 	end
@@ -92,4 +93,17 @@ function AntibirthItemPack:SpawnJawbone(player)
 	end
 	
 	SFXManager():Play(SoundEffect.SOUND_SWORD_SPIN)
+	
+	for i, entity in pairs(Isaac.FindInRadius(jawbone.Position, 120)) do -- tear reflecting 
+		if entity.Type == EntityType.ENTITY_PROJECTILE and entity.SpawnerType ~= EntityType.ENTITY_PLAYER then
+			local angle = ((player.Position - entity.Position) * -1):GetAngleDegrees()
+			for i = 0, 0 do
+				if (sprite:IsPlaying("SpinLeft") or sprite:IsPlaying("SpinUp") or sprite:IsPlaying("SpinRight") or sprite:IsPlaying("SpinDown")) and  entity:Exists() and tearReflecting <= 25 then
+					local reflectedTear = Isaac.Spawn(2, 1, 0, entity.Position, Vector.FromAngle(angle):Resized(10), jawbone):ToTear()	
+				end
+			end
+			entity:Remove()
+		end
+		
+	end
 end
