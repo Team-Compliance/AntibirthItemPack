@@ -118,7 +118,6 @@ function AntibirthItemPack:SpawnJawbone(player)
 			if entity.HitPoints < jawbone.CollisionDamage then
 				if not entity:IsBoss() then
 					if heartSpawnChance > 1 and heartSpawnChance <= 9 then
-						print("mierda")
 						heartSpawn = Isaac.Spawn(5, 10, 2, entity.Position, Vector.Zero, player):ToPickup()
 						heartSpawn.Timeout = 60
 					elseif heartSpawnChance <= 1 then
