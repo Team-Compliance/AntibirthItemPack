@@ -55,13 +55,17 @@ AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_TEAR_COLLISION, AntibirthItemP
 function AntibirthItemPack:SpawnJawbone(player)
 	local jawbone = Isaac.Spawn(2, 1001, 0, player.Position, Vector.Zero, player):ToTear()
 	local data = AntibirthItemPack:GetData(jawbone)
+	local jawboneDamage = (player.Damage * 8) + 10
+	if player:HasCollectible(CollectibleType.COLLECTIBLE_MOMS_KNIFE) then
+		jawboneDamage = (player.Damage * 8) + 16
+	end
 	
 	
 	data.isJawbone = true
 	jawbone.Parent = player
 	jawbone.EntityCollisionClass = EntityCollisionClass.ENTCOLL_ENEMIES
 	jawbone.GridCollisionClass = GridCollisionClass.COLLISION_SOLID
-	jawbone.CollisionDamage = (player.Damage * 8) + 10
+	jawbone.CollisionDamage = jawboneDamage
 	jawbone:AddTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_SPECTRAL | TearFlags.TEAR_EXTRA_GORE)
 	if player:HasCollectible(CollectibleType.COLLECTIBLE_IPECAC) then
 		jawbone:AddTearFlags(TearFlags.TEAR_POISON)
