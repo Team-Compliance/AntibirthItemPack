@@ -55,7 +55,7 @@ function AntibirthItemPack:BowlShoot(player)
 			end
 			local shootVector = Vector.FromAngle(angle)
 			local charge = data.HoldingBowl ~= -1 and AntibirthItemPack:GetCharge(player,data.HoldingBowl) or 6
-			for i= 1,AntibirthItemPack:GetRandomNumber(charge+4,charge*2+4,rng) do
+			for i= 1,AntibirthItemPack:GetRandomNumber(10,14,rng) do
 				--local angle = Vector(AntibirthItemPack:GetRandomNumber(-2,2,rng),AntibirthItemPack:GetRandomNumber(-2,2,rng))
 				local tear = player:FireTear(player.Position,(shootVector*player.ShotSpeed):Rotated(AntibirthItemPack:GetRandomNumber(-10,10,rng))*AntibirthItemPack:GetRandomNumber(6,10,rng) + player.Velocity,false,true,false,player)
 				tear.FallingSpeed = AntibirthItemPack:GetRandomNumber(-15,-3, rng)
