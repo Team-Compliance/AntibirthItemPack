@@ -9,7 +9,6 @@ AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, AntibirthItemPack.P
 function AntibirthItemPack:PlayerHurt(TookDamage, DamageAmount, DamageFlags, DamageSource, DamageCountdownFrames)
 	local player = TookDamage:ToPlayer()
 	local data = AntibirthItemPack:GetData(player)
-	
 	if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_DONKEY_JAWBONE) then
 		if player:HasCollectible(CollectibleType.COLLECTIBLE_20_20) then
 			data.ExtraSpins = data.ExtraSpins + 1
@@ -46,11 +45,43 @@ end
 AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_TEAR_UPDATE, AntibirthItemPack.JawboneUpdate, 1001)
 
 function AntibirthItemPack:MeatySound(entityTear, collider, low)
+	local player = entityTear.SpawnerEntity:ToPlayer()
+
 	if collider:IsActiveEnemy(true) then
 		SFXManager():Play(SoundEffect.SOUND_MEATY_DEATHS)
+		
+		local JawBonerng = player:GetCollectibleRNG(AntibirthItemPack.CollectibleType.COLLECTIBLE_DONKEY_JAWBONE)
+		local heartSpawnChance = AntibirthItemPack:GetRandomNumber(1, 100, JawBonerng)
+		local heartSpawn
+		
+		collider:AddEntityFlags(EntityFlag.FLAG_BLEED_OUT)
+		
+		if collider.HitPoints <= entityTear.CollisionDamage then
+			if not collider:IsBoss() then
+				if heartSpawnChance > 1 and heartSpawnChance <= 9 then
+					heartSpawn = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_HEART, HeartSubType.HEART_HALF, collider.Position, Vector.Zero, player):ToPickup()
+					heartSpawn.Timeout = 60
+				elseif heartSpawnChance <= 1 then
+					heartSpawn = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_HEART, HeartSubType.HEART_FULL, collider.Position, Vector.Zero, player):ToPickup()
+					heartSpawn.Timeout = 60
+				end
+			end
+		end
 	end
 end
 AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_TEAR_COLLISION, AntibirthItemPack.MeatySound, 1001)
+
+function AntibirthItemPack:OnBulletReflectedByJawbone(projectile)
+	local projectileData = projectile:GetData()
+	for i, entity in pairs(Isaac.FindInRadius(projectile.Position, 20, EntityPartition.ENEMY)) do
+		if projectileData.ReflectedByJawbone and projectileData.ReflectedByJawbone == true then
+			entity:TakeDamage(3.5, 0, EntityRef(p), 0)
+			projectile:Kill()
+			SFXManager():Stop(SoundEffect.SOUND_DEATH_BURST_SMALL)
+		end
+	end
+end
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_PROJECTILE_UPDATE, AntibirthItemPack.OnBulletReflectedByJawbone)
 
 function AntibirthItemPack:SpawnJawbone(player)
 	local jawbone = Isaac.Spawn(2, 1001, 0, player.Position, Vector.Zero, player):ToTear()
@@ -60,7 +91,9 @@ function AntibirthItemPack:SpawnJawbone(player)
 		jawboneDamage = (player.Damage * 8) + 16
 	end
 	
-	
+	local JawBonerng = player:GetCollectibleRNG(AntibirthItemPack.CollectibleType.COLLECTIBLE_DONKEY_JAWBONE)
+
+
 	data.isJawbone = true
 	jawbone.Parent = player
 	jawbone.EntityCollisionClass = EntityCollisionClass.ENTCOLL_ENEMIES
@@ -98,36 +131,21 @@ function AntibirthItemPack:SpawnJawbone(player)
 	
 	SFXManager():Play(SoundEffect.SOUND_SWORD_SPIN)
 	
-	for i, entity in pairs(Isaac.FindInRadius(jawbone.Position, 120)) do -- tear reflecting 
-		if entity.Type == EntityType.ENTITY_PROJECTILE and entity.SpawnerType ~= EntityType.ENTITY_PLAYER then
-			local tearReflecting = math.random(100)
-			local angle = ((player.Position - entity.Position) * -1):GetAngleDegrees()
-			for i = 0, 0 do
-				if (sprite:IsPlaying("SpinLeft") or sprite:IsPlaying("SpinUp") or sprite:IsPlaying("SpinRight") or sprite:IsPlaying("SpinDown")) and  entity:Exists() and tearReflecting <= 25 then
-					local reflectedTear = Isaac.Spawn(2, 1, 0, entity.Position, Vector.FromAngle(angle):Resized(10), jawbone):ToTear()	
-				end
-			end
-			entity:Remove()
+	for i, entity in pairs(Isaac.FindInRadius(jawbone.Position, 120, EntityPartition.BULLET)) do
+		local projectile = entity:ToProjectile()
+		local projectileData = projectile:GetData()
+		local angle = ((player.Position - projectile.Position) * -1):GetAngleDegrees()
+		local reflectChance = AntibirthItemPack:GetRandomNumber(1, 100, JawBonerng)
+		
+		if not projectileData.ReflectedByJawbone then
+			projectileData.ReflectedByJawbone = false
 		end
-	end
-	
-	for i, entity in pairs(Isaac.FindInRadius(jawbone.Position, 120, EntityPartition.ENEMY)) do -- Spawning dissapearing hearts and adding bleed effect to enemies
-		if entity:IsActiveEnemy() then
-			local heartSpawnChance = math.random(100)
-			local heartSpawn = nil
-			if entity.HitPoints < jawbone.CollisionDamage then
-				if not entity:IsBoss() then
-					if heartSpawnChance > 1 and heartSpawnChance <= 9 then
-						heartSpawn = Isaac.Spawn(5, 10, 2, entity.Position, Vector.Zero, player):ToPickup()
-						heartSpawn.Timeout = 60
-					elseif heartSpawnChance <= 1 then
-						heartSpawn = Isaac.Spawn(5, 10, 1, entity.Position, Vector.Zero, player):ToPickup()
-						heartSpawn.Timeout = 60
-					end
-				end
-			else
-				entity:AddEntityFlags(EntityFlag.FLAG_BLEED_OUT)
-			end
+		
+		if reflectChance <= 25 then
+			projectileData.ReflectedByJawbone = true
+			projectile.Velocity = Vector.FromAngle(angle):Resized(10)
+		else
+			projectile:Die()
 		end
 	end
 end
