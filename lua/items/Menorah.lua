@@ -20,7 +20,7 @@ end
 
 local function DupeTear(tear)
 	local nt = Isaac.Spawn(tear.Type, tear.Variant, tear.SubType, tear.Position, tear.Velocity, tear):ToTear()
-	nt.Parent = tear
+	nt.Parent = tear.Parent
 	nt.Color = tear.Color
 	nt.FallingSpeed = tear.FallingSpeed
 	nt.FallingAcceleration = tear.FallingAcceleration
@@ -247,7 +247,9 @@ function AntibirthItemPack:onFamiliarUpdate(menorah)
 	local sprite = menorah:GetSprite()
 	local player = menorah.Player
 	local data = AntibirthItemPack.GetEntityData(player)
-		
+	if not data.MenorahFlames then
+		data.MenorahFlames = 1
+	end	
 	if data.MenorahFlames == 1 then
 		sprite:Play("Idle1", false)
 	elseif data.MenorahFlames == 2 then
