@@ -11,6 +11,7 @@ AntibirthItemPack.CollectibleType = {
 
 AntibirthItemPack.PlayerPersistentData = {}
 AntibirthItemPack.RunPersistentData = {}
+AntibirthItemPack.RNG = RNG()
 
 --Amazing save manager
 local continue = false
@@ -130,7 +131,7 @@ function AntibirthItemPack:GetPlayers(functionCheck, ...)
 end
 
 function AntibirthItemPack:GetPlayerFromTear(tear)
-	local check = tear.Parent or AntibirthItemPack:GetSpawner(tear) or tear.SpawnerEntity
+	local check = tear.Parent or tear.SpawnerEntity
 	if check then
 		if check.Type == EntityType.ENTITY_PLAYER then
 			return AntibirthItemPack:GetPtrHashEntity(check):ToPlayer()
@@ -139,25 +140,6 @@ function AntibirthItemPack:GetPlayerFromTear(tear)
 			data.IsFamiliarPlayerTear = true
 			return check:ToFamiliar().Player:ToPlayer()
 		end
-	end
-	return nil
-end
-
-function AntibirthItemPack:GetSpawner(entity)
-	if entity and entity.GetData then
-		local spawnData = AntibirthItemPack:GetSpawnData(entity)
-		if spawnData and spawnData.SpawnerEntity then
-			local spawner = AntibirthItemPack:GetPtrHashEntity(spawnData.SpawnerEntity)
-			return spawner
-		end
-	end
-	return nil
-end
-
-function AntibirthItemPack:GetSpawnData(entity)
-	if entity and entity.GetData then
-		local data = AntibirthItemPack:GetData(entity)
-		return data.SpawnData
 	end
 	return nil
 end
@@ -186,31 +168,6 @@ function AntibirthItemPack:GetData(entity)
 	end
 	return nil
 end
-
-local entitySpawnData = {}
-AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, function(_, type, variant, subType, position, velocity, spawner, seed)
-	entitySpawnData[seed] = {
-		Type = type,
-		Variant = variant,
-		SubType = subType,
-		Position = position,
-		Velocity = velocity,
-		SpawnerEntity = spawner,
-		InitSeed = seed
-	}
-end)
-AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_TEAR_INIT, function(_, entity)
-	local seed = entity.InitSeed
-	local data = AntibirthItemPack:GetData(entity)
-	data.SpawnData = entitySpawnData[seed]
-end)
-AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_ENTITY_REMOVE, function(_, entity)
-	local data = AntibirthItemPack:GetData(entity)
-	data.SpawnData = nil
-end)
-AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, function()
-	entitySpawnData = {}
-end)
 
 function AntibirthItemPack:GetRandomNumber(numMin, numMax, rng)
 	if not numMax then

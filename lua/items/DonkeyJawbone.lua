@@ -1,12 +1,15 @@
-function AntibirthItemPack:PostNewRoom()
+local DonkeyJawbone = {}
+local JawboneVariant = Isaac.GetEntityVariantByName("Antibirth Donkey Jawbone")
+
+function DonkeyJawbone:PostNewRoom()
 	for _, player in pairs(AntibirthItemPack:GetPlayers()) do
 		local data = AntibirthItemPack:GetData(player)
 		data.ExtraSpins = 0 --just in case it gets interrupted
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, AntibirthItemPack.PostNewRoom)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, DonkeyJawbone.PostNewRoom)
 
-function AntibirthItemPack:PlayerHurt(TookDamage, DamageAmount, DamageFlags, DamageSource, DamageCountdownFrames)
+function DonkeyJawbone:PlayerHurt(TookDamage, DamageAmount, DamageFlags, DamageSource, DamageCountdownFrames)
 	local player = TookDamage:ToPlayer()
 	local data = AntibirthItemPack:GetData(player)
 	if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_DONKEY_JAWBONE) then
@@ -20,13 +23,13 @@ function AntibirthItemPack:PlayerHurt(TookDamage, DamageAmount, DamageFlags, Dam
 			data.ExtraSpins = data.ExtraSpins + 3
 		end
 		
-		AntibirthItemPack:SpawnJawbone(player)
+		DonkeyJawbone:SpawnJawbone(player)
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, AntibirthItemPack.PlayerHurt, EntityType.ENTITY_PLAYER)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, DonkeyJawbone.PlayerHurt, EntityType.ENTITY_PLAYER)
 
 
-function AntibirthItemPack:JawboneUpdate(jawbone)
+function DonkeyJawbone:JawboneUpdate(jawbone)
 	local player = AntibirthItemPack:GetPlayerFromTear(jawbone)
 	local data = AntibirthItemPack:GetData(player)
 	local sprite = jawbone:GetSprite()
@@ -37,14 +40,14 @@ function AntibirthItemPack:JawboneUpdate(jawbone)
 	else
 		jawbone:Remove()
 		if data.ExtraSpins > 0 then
-			AntibirthItemPack:SpawnJawbone(player)
+			DonkeyJawbone:SpawnJawbone(player)
 			data.ExtraSpins = data.ExtraSpins - 1
 		end
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_TEAR_UPDATE, AntibirthItemPack.JawboneUpdate, 1001)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_TEAR_UPDATE, DonkeyJawbone.JawboneUpdate, JawboneVariant)
 
-function AntibirthItemPack:MeatySound(entityTear, collider, low)
+function DonkeyJawbone:MeatySound(entityTear, collider, low)
 	local player = entityTear.SpawnerEntity:ToPlayer()
 
 	if collider:IsActiveEnemy(true) then
@@ -69,22 +72,22 @@ function AntibirthItemPack:MeatySound(entityTear, collider, low)
 		end
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_TEAR_COLLISION, AntibirthItemPack.MeatySound, 1001)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_TEAR_COLLISION, DonkeyJawbone.MeatySound, JawboneVariant)
 
-function AntibirthItemPack:OnBulletReflectedByJawbone(projectile)
+function DonkeyJawbone:OnBulletReflectedByJawbone(projectile)
 	local projectileData = projectile:GetData()
 	for i, entity in pairs(Isaac.FindInRadius(projectile.Position, 20, EntityPartition.ENEMY)) do
-		if projectileData.ReflectedByJawbone and projectileData.ReflectedByJawbone == true then
-			entity:TakeDamage(3.5, 0, EntityRef(p), 0)
+		if projectileData.ReflectedByJawbone then
+			entity:TakeDamage(3.5, 0, EntityRef(projectileData.ReflectedByJawbone), 0)
 			projectile:Kill()
 			SFXManager():Stop(SoundEffect.SOUND_DEATH_BURST_SMALL)
 		end
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_PROJECTILE_UPDATE, AntibirthItemPack.OnBulletReflectedByJawbone)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_PROJECTILE_UPDATE, DonkeyJawbone.OnBulletReflectedByJawbone)
 
-function AntibirthItemPack:SpawnJawbone(player)
-	local jawbone = Isaac.Spawn(2, 1001, 0, player.Position, Vector.Zero, player):ToTear()
+function DonkeyJawbone:SpawnJawbone(player)
+	local jawbone = Isaac.Spawn(2, JawboneVariant, 0, player.Position, Vector.Zero, player):ToTear()
 	local data = AntibirthItemPack:GetData(jawbone)
 	local jawboneDamage = (player.Damage * 8) + 10
 	if player:HasCollectible(CollectibleType.COLLECTIBLE_MOMS_KNIFE) then
@@ -137,12 +140,8 @@ function AntibirthItemPack:SpawnJawbone(player)
 		local angle = ((player.Position - projectile.Position) * -1):GetAngleDegrees()
 		local reflectChance = AntibirthItemPack:GetRandomNumber(1, 100, JawBonerng)
 		
-		if not projectileData.ReflectedByJawbone then
-			projectileData.ReflectedByJawbone = false
-		end
-		
 		if reflectChance <= 25 then
-			projectileData.ReflectedByJawbone = true
+			projectileData.ReflectedByJawbone = player
 			projectile.Velocity = Vector.FromAngle(angle):Resized(10)
 		else
 			projectile:Die()
