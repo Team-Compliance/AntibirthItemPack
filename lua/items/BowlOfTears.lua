@@ -136,17 +136,22 @@ end
 --lifting and hiding bowl
 function BowlOfTears:UseBowl(collectibleType, rng, player, useFlags, slot, customdata)
 	local data = AntibirthItemPack:GetData(player)
-	if data.HoldingBowl ~= slot then
-		data.HoldingBowl = slot
-		player:AnimateCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS, "LiftItem", "PlayerPickup")
-		data.BowlWaitFrames = 20
+	if AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS == collectibleType then
+		if data.HoldingBowl ~= slot then
+			data.HoldingBowl = slot
+			player:AnimateCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS, "LiftItem", "PlayerPickup")
+			data.BowlWaitFrames = 20
+		else
+			data.HoldingBowl = nil
+			data.BowlWaitFrames = 0
+			player:AnimateCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS, "HideItem", "PlayerPickup")
+		end
+		local returntable = {Discharge = false, Remove = false, ShowAnim = false} --don't discharge, don't remove item, don't show animation
+		return returntable
 	else
 		data.HoldingBowl = nil
 		data.BowlWaitFrames = 0
-		player:AnimateCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS, "HideItem", "PlayerPickup")
 	end
-	local returntable = {Discharge = false, Remove = false, ShowAnim = false} --don't discharge, don't remove item, don't show animation
-	return returntable
 end
 
 --reseting state/slot number on new room
@@ -250,7 +255,7 @@ function BowlOfTears:WispUpdateBOT(wisp)
 	end
 end
 
-AntibirthItemPack:AddCallback(ModCallbacks.MC_USE_ITEM, BowlOfTears.UseBowl, AntibirthItemPack.CollectibleType.COLLECTIBLE_BOWL_OF_TEARS)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_USE_ITEM, BowlOfTears.UseBowl)
 AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, BowlOfTears.BowlRoomUpdate)
 AntibirthItemPack:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, BowlOfTears.DamagedWithBowl, EntityType.ENTITY_PLAYER)
 AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, BowlOfTears.BowlShoot)
