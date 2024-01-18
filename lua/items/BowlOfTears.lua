@@ -206,6 +206,8 @@ function BowlOfTears:BowlShoot(player)
 				if REPENTOGON then
 					if player:HasCollectible(CollectibleType.COLLECTIBLE_CHOCOLATE_MILK) then
 						tear.CollisionDamage = math.max(player.Damage, player.Damage * player:GetWeapon(1):GetCharge() / player.MaxFireDelay)
+					else
+						tear.CollisionDamage = player.Damage
 					end
 				else
 					tear.CollisionDamage = player.Damage
