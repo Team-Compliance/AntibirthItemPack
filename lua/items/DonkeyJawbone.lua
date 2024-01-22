@@ -1,15 +1,17 @@
-function AntibirthItemPack:PostNewRoom()
+local DonkeyJawbone = {}
+local JawboneVariant = Isaac.GetEntityVariantByName("Antibirth Donkey Jawbone")
+
+function DonkeyJawbone:PostNewRoom()
 	for _, player in pairs(AntibirthItemPack:GetPlayers()) do
 		local data = AntibirthItemPack:GetData(player)
 		data.ExtraSpins = 0 --just in case it gets interrupted
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, AntibirthItemPack.PostNewRoom)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, DonkeyJawbone.PostNewRoom)
 
-function AntibirthItemPack:PlayerHurt(TookDamage, DamageAmount, DamageFlags, DamageSource, DamageCountdownFrames)
+function DonkeyJawbone:PlayerHurt(TookDamage, DamageAmount, DamageFlags, DamageSource, DamageCountdownFrames)
 	local player = TookDamage:ToPlayer()
 	local data = AntibirthItemPack:GetData(player)
-	
 	if player:HasCollectible(AntibirthItemPack.CollectibleType.COLLECTIBLE_DONKEY_JAWBONE) then
 		if player:HasCollectible(CollectibleType.COLLECTIBLE_20_20) then
 			data.ExtraSpins = data.ExtraSpins + 1
@@ -21,13 +23,13 @@ function AntibirthItemPack:PlayerHurt(TookDamage, DamageAmount, DamageFlags, Dam
 			data.ExtraSpins = data.ExtraSpins + 3
 		end
 		
-		AntibirthItemPack:SpawnJawbone(player)
+		DonkeyJawbone:SpawnJawbone(player)
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, AntibirthItemPack.PlayerHurt, EntityType.ENTITY_PLAYER)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, DonkeyJawbone.PlayerHurt, EntityType.ENTITY_PLAYER)
 
 
-function AntibirthItemPack:JawboneUpdate(jawbone)
+function DonkeyJawbone:JawboneUpdate(jawbone)
 	local player = AntibirthItemPack:GetPlayerFromTear(jawbone)
 	local data = AntibirthItemPack:GetData(player)
 	local sprite = jawbone:GetSprite()
@@ -38,30 +40,69 @@ function AntibirthItemPack:JawboneUpdate(jawbone)
 	else
 		jawbone:Remove()
 		if data.ExtraSpins > 0 then
-			AntibirthItemPack:SpawnJawbone(player)
+			DonkeyJawbone:SpawnJawbone(player)
 			data.ExtraSpins = data.ExtraSpins - 1
 		end
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_TEAR_UPDATE, AntibirthItemPack.JawboneUpdate, 1001)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_TEAR_UPDATE, DonkeyJawbone.JawboneUpdate, JawboneVariant)
 
-function AntibirthItemPack:MeatySound(entityTear, collider, low)
+function DonkeyJawbone:MeatySound(entityTear, collider, low)
+	local player = entityTear.SpawnerEntity:ToPlayer()
+
 	if collider:IsActiveEnemy(true) then
 		SFXManager():Play(SoundEffect.SOUND_MEATY_DEATHS)
+		
+		local JawBonerng = player:GetCollectibleRNG(AntibirthItemPack.CollectibleType.COLLECTIBLE_DONKEY_JAWBONE)
+		local heartSpawnChance = AntibirthItemPack:GetRandomNumber(1, 100, JawBonerng)
+		local heartSpawn
+		
+		collider:AddEntityFlags(EntityFlag.FLAG_BLEED_OUT)
+		
+		if collider.HitPoints <= entityTear.CollisionDamage then
+			if not collider:IsBoss() then
+				if heartSpawnChance > 1 and heartSpawnChance <= 9 then
+					heartSpawn = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_HEART, HeartSubType.HEART_HALF, collider.Position, Vector.Zero, player):ToPickup()
+					heartSpawn.Timeout = 60
+				elseif heartSpawnChance <= 1 then
+					heartSpawn = Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_HEART, HeartSubType.HEART_FULL, collider.Position, Vector.Zero, player):ToPickup()
+					heartSpawn.Timeout = 60
+				end
+			end
+		end
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_TEAR_COLLISION, AntibirthItemPack.MeatySound, 1001)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_PRE_TEAR_COLLISION, DonkeyJawbone.MeatySound, JawboneVariant)
 
-function AntibirthItemPack:SpawnJawbone(player)
-	local jawbone = Isaac.Spawn(2, 1001, 0, player.Position, Vector.Zero, player):ToTear()
+function DonkeyJawbone:OnBulletReflectedByJawbone(projectile)
+	local projectileData = projectile:GetData()
+	for i, entity in pairs(Isaac.FindInRadius(projectile.Position, 20, EntityPartition.ENEMY)) do
+		if projectileData.ReflectedByJawbone then
+			entity:TakeDamage(3.5, 0, EntityRef(projectileData.ReflectedByJawbone), 0)
+			projectile:Kill()
+			SFXManager():Stop(SoundEffect.SOUND_DEATH_BURST_SMALL)
+		end
+	end
+end
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_PROJECTILE_UPDATE, DonkeyJawbone.OnBulletReflectedByJawbone)
+
+function DonkeyJawbone:SpawnJawbone(player)
+	local jawbone = Isaac.Spawn(2, JawboneVariant, 0, player.Position, Vector.Zero, player):ToTear()
 	local data = AntibirthItemPack:GetData(jawbone)
+	local jawboneDamage = (player.Damage * 8) + 10
+	if player:HasCollectible(CollectibleType.COLLECTIBLE_MOMS_KNIFE) then
+		jawboneDamage = (player.Damage * 8) + 16
+	end
 	
+	local JawBonerng = player:GetCollectibleRNG(AntibirthItemPack.CollectibleType.COLLECTIBLE_DONKEY_JAWBONE)
+
+
 	data.isJawbone = true
 	jawbone.Parent = player
 	jawbone.EntityCollisionClass = EntityCollisionClass.ENTCOLL_ENEMIES
 	jawbone.GridCollisionClass = GridCollisionClass.COLLISION_SOLID
-	jawbone.CollisionDamage = (player.Damage * 8) + 10
-	jawbone:AddTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_SPECTRAL | TearFlags.TEAR_SHIELDED | TearFlags.TEAR_HP_DROP | TearFlags.TEAR_EXTRA_GORE)
+	jawbone.CollisionDamage = jawboneDamage
+	jawbone:AddTearFlags(TearFlags.TEAR_PIERCING | TearFlags.TEAR_SPECTRAL | TearFlags.TEAR_EXTRA_GORE)
 	if player:HasCollectible(CollectibleType.COLLECTIBLE_IPECAC) then
 		jawbone:AddTearFlags(TearFlags.TEAR_POISON)
 	end
@@ -92,4 +133,18 @@ function AntibirthItemPack:SpawnJawbone(player)
 	end
 	
 	SFXManager():Play(SoundEffect.SOUND_SWORD_SPIN)
+	
+	for i, entity in pairs(Isaac.FindInRadius(jawbone.Position, 120, EntityPartition.BULLET)) do
+		local projectile = entity:ToProjectile()
+		local projectileData = projectile:GetData()
+		local angle = ((player.Position - projectile.Position) * -1):GetAngleDegrees()
+		local reflectChance = AntibirthItemPack:GetRandomNumber(1, 100, JawBonerng)
+		
+		if reflectChance <= 25 then
+			projectileData.ReflectedByJawbone = player
+			projectile.Velocity = Vector.FromAngle(angle):Resized(10)
+		else
+			projectile:Die()
+		end
+	end
 end

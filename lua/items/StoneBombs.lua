@@ -1,4 +1,4 @@
-local mod = AntibirthItemPack
+local StoneBombs = {}
 
 local directions = {
 	0,
@@ -7,7 +7,7 @@ local directions = {
 	270
 }
 
-function AntibirthItemPack:SB_BombUpdate(bomb)
+function StoneBombs:SB_BombUpdate(bomb)
 	local player = AntibirthItemPack:GetPlayerFromTear(bomb)
 	local data = AntibirthItemPack:GetData(bomb)
 	
@@ -42,15 +42,26 @@ function AntibirthItemPack:SB_BombUpdate(bomb)
 		end
 		
 		if sprite:IsPlaying("Explode") then
-			AntibirthItemPack:SB_Explode(bomb, player)
+			StoneBombs:SB_Explode(bomb, player)
 		end
 	end
 end
-AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_BOMB_UPDATE, AntibirthItemPack.SB_BombUpdate)
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_BOMB_UPDATE, StoneBombs.SB_BombUpdate)
 
-function AntibirthItemPack:SB_Explode(bomb, player)
+function StoneBombs:SB_Explode(bomb, player)
 	for _, dir in pairs(directions) do
 		local crackwave = Isaac.Spawn(EntityType.ENTITY_EFFECT, EffectVariant.CRACKWAVE, 1, bomb.Position, bomb.Velocity, player)
 		crackwave:ToEffect().Rotation = dir
 	end
 end
+
+function StoneBombs:CrackWavePits(effect)
+	local room = Game():GetRoom()
+	if effect.GridCollisionClass == EntityGridCollisionClass.GRIDCOLL_NOPITS then
+		if room:GetGridEntityFromPos(effect.Position) and room:GetGridEntityFromPos(effect.Position):GetType() == GridEntityType.GRID_PIT then
+			room:GetGridEntityFromPos(effect.Position):ToPit():MakeBridge(nil)
+		end
+	end
+end
+
+AntibirthItemPack:AddCallback(ModCallbacks.MC_POST_BOMB_UPDATE, StoneBombs.SB_BombUpdate)
