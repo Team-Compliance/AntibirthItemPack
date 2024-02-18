@@ -330,7 +330,7 @@ local function OverridePause(self, player, hook, action)
 				end
 			end
 		end
-		return 0.75
+		return true
 	end
 end
 AntibirthItemPack:AddCallback(ModCallbacks.MC_INPUT_ACTION, OverridePause, InputHook.IS_ACTION_PRESSED)
